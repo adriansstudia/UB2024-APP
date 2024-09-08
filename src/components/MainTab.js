@@ -8,7 +8,7 @@ const MainTab = () => {
   return (
     <div className="main-tab">
       <h1>UB2024</h1>
-      <button className="lista-pytan-button" onClick={() => navigate('/questions')}>
+      <button className="lista-pytan-button" onClick={() => navigate('/UB2024-APP/questions')}>
         Lista Pytań
       </button>
     </div>

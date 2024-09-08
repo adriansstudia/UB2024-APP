@@ -109,8 +109,8 @@ const QuestionsList = ({
             <p>
               {question.question} (Number: {question.number}, Kategoria: {question.kategoria}, Zestaw: {question.zestaw}, Rating: {question.rating})
             </p>
-            <button onClick={() => navigate(`/question/${question.id}`)}>View</button>
-            <button onClick={() => navigate(`/edit/${question.id}`)}>Edit</button>
+            <button onClick={() => navigate(`/UB2024-APP/question/${question.id}`)}>View</button>
+            <button onClick={() => navigate(`/UB2024-APP/edit/${question.id}`)}>Edit</button>
             <button onClick={() => handleDelete(question.id)}>Delete</button>
           </li>
         ))}

@@ -21,7 +21,7 @@ const EditQuestion = ({ questions, saveQuestion }) => {
     } else {
       // Handle case where question is not found
       console.error('Question not found');
-      navigate('/questions'); // Redirect to questions list or show an error
+      navigate('/UB2024-APP/questions'); // Redirect to questions list or show an error
     }
   }, [id, questions, navigate]);
 
@@ -32,7 +32,7 @@ const EditQuestion = ({ questions, saveQuestion }) => {
 
   const handleSubmit = () => {
     saveQuestion(id, editedQuestion);
-    navigate('/questions');
+    navigate('/UB2024-APP/questions');
   };
 
   return (
