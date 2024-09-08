@@ -87,7 +87,7 @@ function App() {
           <Route path="/UB2024-APP/" element={<MainTab />} />
 
           <Route
-            path="/questions"
+            path="/UB2024-APP/questions"
             element={
               <QuestionsList
                 questions={questions}
@@ -101,7 +101,7 @@ function App() {
             }
           />
           <Route
-            path="/question/:id"
+            path="/UB2024-APP/question/:id"
             element={
               <QuestionDetail
                 questions={questions}
@@ -112,7 +112,7 @@ function App() {
             }
           />
           <Route
-            path="/edit/:id"
+            path="/UB2024-APP/edit/:id"
             element={<EditQuestion questions={questions} saveQuestion={updateQuestion} />}
           />
         </Routes>
