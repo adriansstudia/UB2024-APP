@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import MainTab from './components/MainTab';
 import QuestionsList from './components/QuestionsList';
@@ -7,10 +7,28 @@ import EditQuestion from './components/EditQuestion';
 import './App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+// Key for saving to localStorage
+const LOCAL_STORAGE_KEY = 'UB2024_QuestionsData';
+
 function App() {
   const [questions, setQuestions] = useState([]);
   const [sortBy, setSortBy] = useState('');
   const [filterBy, setFilterBy] = useState('');
+
+  // Load data from localStorage on first render
+  useEffect(() => {
+    const storedQuestions = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedQuestions) {
+      setQuestions(JSON.parse(storedQuestions));
+    }
+  }, []);
+
+  // Save questions data to localStorage whenever the state changes
+  useEffect(() => {
+    if (questions.length > 0) {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(questions));
+    }
+  }, [questions]);
 
   const addQuestions = (newQuestions) => {
     setQuestions([...questions, ...newQuestions]);
