@@ -1,0 +1,168 @@
+/* components/QuestionDetail.css */
+/* Example with Open Sans from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+
+
+.question-detail {
+  font-family: 'Open Sans', Arial, sans-serif;
+  background-color: #f5f5f5;
+  padding: 20px;
+  margin: 20px; /* Uniform margin */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative; /* For positioning internal elements */
+  
+  /* Use viewport units to ensure it fills the screen */
+  width: calc(100vw - 80px); /* Full width minus margins */
+  height: calc(100vh - 80px); /* Full height minus margins */
+  
+  overflow-y: auto; /* Allow scrolling for overflowing content */
+  box-sizing: border-box; /* Include padding and border in width/height calculations */
+}
+
+.question-detail h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px; /* Adjusted margin */
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #555;
+}
+
+.question-header p {
+  margin: 0;
+}
+
+
+
+.question-content {
+  margin-bottom: 20px;
+  position: relative; /* To position the Hide Answer button */
+}
+
+.reveal-button {
+  background-color: rgba(0, 0, 0, 0.5); /* 50% transparent black */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.reveal-button.hidden {
+  display: none; /* Hide the button when the answer is revealed */
+}
+
+/* Hide Answer button */
+.hide-button {
+  position: fixed;
+  bottom: 20px; /* Positioned at the bottom */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.5); /* 50% transparent white */
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  color: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 10;
+}
+
+.hide-button:hover {
+  background-color: #888;
+  color: white;
+}
+
+.answer-container {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.5s ease-out;
+  padding: 0px; /* Adding some padding for better readability */
+
+  border-radius: 4px; /* Rounded corners */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Slight shadow for better visibility */
+}
+
+.answer-container.revealed {
+  max-height: 1000px; /* Adjust as needed */
+  transition: max-height 0.5s ease-in;
+}
+
+/* Ensure the container takes full width and positions items below */
+.buttons-container {
+  display: flex;
+  justify-content: space-between; /* Distribute buttons evenly */
+  margin-top: 20px; /* Add spacing from the content */
+}
+
+.buttons-container button {
+  background-color: rgba(0, 0, 0, 0.5); /* 50% transparent black */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.buttons-container button:hover {
+  background-color: rgba(0, 0, 0, 0.7); /* Slightly less transparent on hover */
+}
+
+.rate-icon {
+  font-size: 20px; /* Adjust size as needed */
+  color: rgba(0, 0, 0, 0.7); /* 50% transparent */
+  cursor: pointer;
+  position: fixed; /* Fixed position so it stays on top */
+  top: 20px; /* Adjust position from top */
+  right: 20px; /* Adjust position from right */
+  z-index: 1000; /* High z-index to ensure it's always on top */
+}
+
+.rate-icon:hover {
+  color: rgba(0, 0, 0, 1); /* Full opacity on hover */
+}
+
+.back-button {
+  position: fixed; /* Fixed position so it stays on top */
+  top: 20px;
+  left: 20px;
+  background: transparent !important; /* No background */
+  border: none !important; /* No border */
+  font-size: 24px; /* Adjust size */
+  color: #888 !important; /* Grey color for the icon */
+  cursor: pointer;
+  z-index: 1000; /* High z-index to ensure it's always on top */
+}
+
+/* Bold arrows for Previous and Next buttons */
+.prev-arrow, .next-arrow {
+  font-size: 24px; /* Adjust size */
+  color: rgba(0, 0, 0, 0.7); /* Slightly transparent */
+  cursor: pointer;
+  background: transparent; /* No background */
+  border: none; /* No border */
+  position: fixed;
+  bottom: 50px; /* Always visible at the bottom */
+  z-index: 100; /* Make sure they are above other elements */
+}
+
+.prev-arrow {
+  left: 20px; /* Positioned on the left */
+}
+
+.next-arrow {
+  right: 20px; /* Positioned on the right */
+}
+
+.prev-arrow:hover, .next-arrow:hover {
+  color: rgba(0, 0, 0, 1); /* Full opacity on hover */
+}
