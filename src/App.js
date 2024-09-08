@@ -1,13 +1,11 @@
-// App.js
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import MainTab from './components/MainTab';
 import QuestionsList from './components/QuestionsList';
 import QuestionDetail from './components/QuestionDetail';
 import EditQuestion from './components/EditQuestion';
 import './App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
 
 function App() {
   const [questions, setQuestions] = useState([]);
@@ -64,7 +62,12 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/" element={<MainTab />} />
+          {/* Redirect from root path to /UB2024-APP/ */}
+          <Route path="/" element={<Navigate to="/UB2024-APP/" replace />} />
+
+          {/* MainTab component with /UB2024-APP/ path */}
+          <Route path="/UB2024-APP/" element={<MainTab />} />
+
           <Route
             path="/questions"
             element={
