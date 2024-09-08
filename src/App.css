@@ -60,3 +60,18 @@
 .rating-popup button {
   margin: 5px;
 }
+/* App.css */
+.save-state-button, .load-state-button {
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-state-button:hover, .load-state-button:hover {
+  background-color: #45a049;
+}
+

@@ -1,0 +1,233 @@
+.questions-list {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative; /* To position the menu icon */
+    min-height: 100vh; /* Full viewport height */
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .header button {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #888;
+    cursor: pointer;
+  }
+  
+  .menu-container {
+    position: relative;
+  }
+  
+  .menu-icon {
+    font-size: 20px; /* Adjust size as needed */
+    color: rgba(0, 0, 0, 0.7); /* 50% transparent */
+    cursor: pointer;
+    position: fixed; /* Fixed position so it stays on top */
+    top: 20px; /* Adjust position from top */
+    right: 20px; /* Adjust position from right */
+    z-index: 1000; /* High z-index to ensure it's always on top */
+  }
+   
+  .menu-icon:hover {
+    color: rgba(0, 0, 0, 1); /* Full opacity on hover */
+  }
+
+  .menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    min-width: 120px;
+  }
+
+  .menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  
+  .menu-button {
+    font-size: 18px !important; /* Set font size to 1.2 rem units */
+    display: block;
+    background: transparent;
+    border: none;
+    padding: 15px;
+    margin: 5px 0px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1rem!important; /* Adjust the font size here */
+    color: #333;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .menu-button:hover {
+    background-color: #f0f0f0;
+    color: #000;
+  }
+  
+  .filters, .filter-options {
+    margin-bottom: 10px;
+
+  }
+
+  .filters {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+.import-button,
+.add-button,
+.clear-button {
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+  
+  .import-button {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .add-button {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .clear-button {
+    background-color: #dc3545;
+    color: #fff;
+  }
+   
+  
+  .filter-button {
+    font-size: 14px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    margin-right: 10px;
+  }
+  
+  .filters button:hover, .filter-options select:hover, .filter-options button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  li {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  li button {
+    background: transparent;
+    border: none;
+    color: #363636;
+    cursor: pointer;
+    margin-right: 10px;
+
+  }
+  
+  li button:hover {
+    text-decoration: underline;
+  }
+
+  .question-container {
+    margin-top: 20px;
+  }
+  
+  .question-header,
+  .question-row {
+    cursor: pointer;
+    background-color:#f5f5f5;
+    display: grid;
+    grid-template-columns: 2% 5% 73% 10% 5% 5%;
+    grid-gap: 0px;
+    padding: 10px;
+  }
+  .question-header .column:nth-child(1),
+  .question-row .column:nth-child(1) {
+    font-size: 16px;
+    font-weight: bold;
+
+  }
+    
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto; /* Pushes actions to the right */
+  }
+  .action-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .edit-button {
+    font-size: 80%;
+    cursor: pointer;
+    color: #4e4e4e; /* Style for edit button */
+  }
+  .edit-button:hover {
+    font-size: 90%;
+    color: #242424;
+  }
+
+  .delete-button {
+    font-size: 80%;
+    cursor: pointer;
+    color: #4e4e4e; /* Style for delete button */
+  }
+  .delete-button:hover {
+    font-size: 90%;
+    color: #242424;
+  }
+
+  .question-header {
+    font-size: 10px;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .question-header .column:nth-child(3),
+  .question-row .column:nth-child(3) {
+    text-align: left; /* Align the third column text to the left */
+  }
+  
+  .question-header:hover,
+  .question-row:hover {
+    background-color:#ebebeb;
+  }
+
+  .column {
+    padding: 5px;
+  }
+  
+
+  .question-row .actions {
+    grid-column: span 6;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }

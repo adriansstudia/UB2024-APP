@@ -1,14 +1,14 @@
-number;question;kategoria;zestaw;rating;answer
-1;Pytanie 1;Projektowanie;Z1;1;odp1
-2;Pytanie 2;Prawo;Z5;5;"I would like to create an app in React. In the next messages I would like you to write a code for it. It should have some features like in Brainscape. But in the first message, just according to the following guide below, write me a plan to make this app in React. Try thinking of all the optimisations you could perform, e.g. using some plugins, to simplify the coding and keep it well organized.
+id,kategoria,zestaw,rating,answer
+9183aceb-453d-4384-87eb-db5195bb1ef6,Projektowanie,Z1,5,odp1 edited
+ff7f442b-8721-434c-90a7-dc61fa17bfa2,Prawo,Z5,5,I would like to create an app in React. In the next messages I would like you to write a code for it. It should have some features like in Brainscape. But in the first message, just according to the following guide below, write me a plan to make this app in React. Try thinking of all the optimisations you could perform, e.g. using some plugins, to simplify the coding and keep it well organized.
 Guide:
 1. Main Tab: the title „UB2024” on the top of the screen. In the middle of the canvas a widget called “Lista Pytań”
 2. When clicked on “Lista Pytań” go to the second tab. On the second tab there should be a list of questions. Each of the questions should also have some properties. The properties are: “Number”, “Kategoria”, “Zestaw”, “Rating” and “Answer”. The “Answer” should be hidden here. Also, next to the question should be “Edit” button, which allows editing each of the properities, and a “delete” button which deletes the question from the list. Also on the top of the screen there should be a button “Import”, which allows to import list of questions with all the properties in csv format and add them to existing list of questions. Also on the top right button “back”, which takes you back to previous tab. Also add a “sort” function, that sorts the questions on the list by its properties “Number”, “Kategoria”, “Zestaw” or “Rating”. Also add a “filter” function the filters questions by it properties “Kategoria”, “Zestaw”, or “show all”.
 2.a. When clicked on the question from the questions list, go to next tab. On this tab there should be a widget with the choosen question with the properties above (without an “Answer”). On this tab there is also a button “Reveal answer”. When clicked, the “Answer” rolls out. The source of “Answer” is html code. There is also a button “previous” and “next” which takes to the next/previous questions from the questions list and button “back” which takes you back to the questions list tab. When clicking “previous” or “next” first show a message: “How difficult was it?” with a rating 1-5 to choose from. When clicking of of these numbers, save it to the “Rating” property of this question and move to previous or next question.
 2.b. When clicked on “Edit” next to the question on the questions list tab, allow me editing the question and all of its properties. The property “Answer” should allow to put there a html code. When clicked on the button “Save”, save all the changes made.
 2.b. When clicked on “Import” the questions list tab, allow me choosing a csv file with list of questions with all the properties, in which columns are: “Number”, “Question”, “Kategoria”, “Zestaw”, “Rating” and “Answer”. Import the list of questions and all their properties and format it like the rest of the questions on the question list tab.
-"
-3;Pytanie 3;Ppoż;Z2;4;odp3
-4;Pytanie 4;Projektowanie;Z8;1;odp4
-5;Pytanie 5;Ppoż;Z9;2;odp5
-6;Pytanie 6;Prawo;Z3;1;odp6
+
+e68c3f94-f40a-4b8c-b9d2-4a318b73de20,Prawo,Z3,1,odp6
+f04dc351-800e-4629-aa28-5b66ba638083,Projektowanie,Z1,1,odp1
+d2851026-ac49-4601-99e9-1520aef9d806,Ppo�,Z9,2,odp5
+61d31dc3-85d5-4133-bd4c-8de9e4d8bc77,Prawo,Z3,1,odp6

@@ -86,8 +86,8 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
       <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
         <FontAwesomeIcon icon={faArrowLeft} />
       </button>
-  
-      <div className="question-header">
+
+      <div className="question-header2">
         <p><strong>Number:</strong> {question.number}</p>
         <p><strong>Kategoria:</strong> {question.kategoria}</p>
         <p><strong>Zestaw:</strong> {question.zestaw}</p>

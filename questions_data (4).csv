@@ -1,6 +1,9 @@
-number;question;kategoria;zestaw;rating;answer
-1;Pytanie 1;Projektowanie;Z1;1;odp1
-2;Pytanie 2;Prawo;Z5;5;"I would like to create an app in React. In the next messages I would like you to write a code for it. It should have some features like in Brainscape. But in the first message, just according to the following guide below, write me a plan to make this app in React. Try thinking of all the optimisations you could perform, e.g. using some plugins, to simplify the coding and keep it well organized.
+number,question,kategoria,zestaw,rating,answer
+4,Pytanie 4,Projektowanie,Z8,1,odp4
+5,Pytanie 5j,Ppoż,Z9,2,odp5
+6,Pytanie 6,Prawo,Z3,1,odp6
+1,Pytanie 1,Projektowanie,Z1,1,odp1
+2,Pytanie 2,Prawo,Z5,5,"I would like to create an app in React. In the next messages I would like you to write a code for it. It should have some features like in Brainscape. But in the first message, just according to the following guide below, write me a plan to make this app in React. Try thinking of all the optimisations you could perform, e.g. using some plugins, to simplify the coding and keep it well organized.
 Guide:
 1. Main Tab: the title „UB2024” on the top of the screen. In the middle of the canvas a widget called “Lista Pytań”
 2. When clicked on “Lista Pytań” go to the second tab. On the second tab there should be a list of questions. Each of the questions should also have some properties. The properties are: “Number”, “Kategoria”, “Zestaw”, “Rating” and “Answer”. The “Answer” should be hidden here. Also, next to the question should be “Edit” button, which allows editing each of the properities, and a “delete” button which deletes the question from the list. Also on the top of the screen there should be a button “Import”, which allows to import list of questions with all the properties in csv format and add them to existing list of questions. Also on the top right button “back”, which takes you back to previous tab. Also add a “sort” function, that sorts the questions on the list by its properties “Number”, “Kategoria”, “Zestaw” or “Rating”. Also add a “filter” function the filters questions by it properties “Kategoria”, “Zestaw”, or “show all”.
@@ -8,7 +11,7 @@ Guide:
 2.b. When clicked on “Edit” next to the question on the questions list tab, allow me editing the question and all of its properties. The property “Answer” should allow to put there a html code. When clicked on the button “Save”, save all the changes made.
 2.b. When clicked on “Import” the questions list tab, allow me choosing a csv file with list of questions with all the properties, in which columns are: “Number”, “Question”, “Kategoria”, “Zestaw”, “Rating” and “Answer”. Import the list of questions and all their properties and format it like the rest of the questions on the question list tab.
 "
-3;Pytanie 3;Ppoż;Z2;4;odp3
-4;Pytanie 4;Projektowanie;Z8;1;odp4
-5;Pytanie 5;Ppoż;Z9;2;odp5
-6;Pytanie 6;Prawo;Z3;1;odp6
+3,Pytanie 3,Ppoż,Z2,4,odp3
+4,Pytanie 4,Projektowanie,Z8,4,odp4
+5,Pytanie 5,Ppoż,Z9,2,odp5
+6,Pytanie 6,Prawo,Z3,1,odp6

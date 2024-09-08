@@ -1,4 +1,7 @@
 number;question;kategoria;zestaw;rating;answer
+1;Pytanie 1ed2;Projektowanie;Z1;3;odp1
+1;Pytanie 1;Projektowanie;Z1;1;odp1
+4;Pytanie 4;Projektowanie;Z8;1;odp4
 1;Pytanie 1;Projektowanie;Z1;1;odp1
 2;Pytanie 2;Prawo;Z5;5;"I would like to create an app in React. In the next messages I would like you to write a code for it. It should have some features like in Brainscape. But in the first message, just according to the following guide below, write me a plan to make this app in React. Try thinking of all the optimisations you could perform, e.g. using some plugins, to simplify the coding and keep it well organized.
 Guide:
