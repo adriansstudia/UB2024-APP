@@ -8,11 +8,15 @@ import './App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { gapi } from 'gapi-script';
 
-const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
+const CLIENT_ID = '907949317321-bk6975dvrni2v8uei720ah5bn5i30tad.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyB4qNObqLuSYE-MVszqngY-Aw8bGx3ghSk';
 const SHEET_ID = '1aR36o-hbh3Sur_ndicM0_KOKbZkczqx6dAB2BL1dEmk'; // The ID of your Google Sheet
 const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+
+
+
+
 
 function App() {
   const [questions, setQuestions] = useState([]);
