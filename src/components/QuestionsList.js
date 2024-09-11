@@ -103,6 +103,14 @@ const QuestionsList = ({
   };
   
 
+  useEffect(() => {
+    // Load the default CSV file when the component mounts
+    fetch('/output_LP.csv')
+      .then(response => response.blob())
+      .then(blob => handleImport(blob))
+      .catch(error => console.error('Error loading default CSV file:', error));
+  }, []);
+
   const handleSaveState = () => {
     console.log('Save State clicked');
   };
