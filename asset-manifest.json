@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/UB2024-APP/static/css/main.aee5d88c.css",
+    "main.css": "/UB2024-APP/static/css/main.500aa47e.css",
     "main.js": "/UB2024-APP/static/js/main.da50fb93.js",
     "static/media/fa-solid-900.ttf": "/UB2024-APP/static/media/fa-solid-900.07ed6d5fa32c1d54af0f.ttf",
     "static/media/fa-brands-400.ttf": "/UB2024-APP/static/media/fa-brands-400.0ff70dcbf135d859ebf3.ttf",
@@ -11,11 +11,11 @@
     "static/media/fa-v4compatibility.ttf": "/UB2024-APP/static/media/fa-v4compatibility.0f6cb412603527bda691.ttf",
     "static/media/fa-v4compatibility.woff2": "/UB2024-APP/static/media/fa-v4compatibility.6cfec8414be20e2c3426.woff2",
     "index.html": "/UB2024-APP/index.html",
-    "main.aee5d88c.css.map": "/UB2024-APP/static/css/main.aee5d88c.css.map",
+    "main.500aa47e.css.map": "/UB2024-APP/static/css/main.500aa47e.css.map",
     "main.da50fb93.js.map": "/UB2024-APP/static/js/main.da50fb93.js.map"
   },
   "entrypoints": [
-    "static/css/main.aee5d88c.css",
+    "static/css/main.500aa47e.css",
     "static/js/main.da50fb93.js"
   ]
 }
