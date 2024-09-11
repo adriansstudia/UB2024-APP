@@ -73,27 +73,35 @@ const QuestionsList = ({
   };
 
   const handleImport = (e) => {
-    const file = e.target.files[0];
+    const fileInput = e.target;
+    const file = fileInput.files[0];
+    
     Papa.parse(file, {
       header: true, // Ensure headers are used
       skipEmptyLines: true,
       complete: (result) => {
+        console.log('Parsed data:', result.data); // Log the parsed data
         const importedQuestions = result.data.map((row) => ({
           id: uuidv4(), // Use UUID for unique IDs
           number: row['number'] || '',
           question: row['question'] || '',
           kategoria: row['kategoria'] || '',
           zestaw: row['zestaw'] || '',
-          rating: row['rating'] || '0',
+          rating: row['rating'] || '',
           answer: row['answer'] || '',
         }));
+        console.log('Imported questions:', importedQuestions); // Log the imported questions
         addQuestions(importedQuestions);
+        
+        // Reset the file input field
+        fileInput.value = null;
       },
       error: (error) => {
         console.error('Error parsing CSV:', error);
       },
     });
   };
+  
 
   const handleSaveState = () => {
     console.log('Save State clicked');
