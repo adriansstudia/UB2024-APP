@@ -69,7 +69,7 @@ const QuestionsList = ({
 
   const handleEdit = (id, e) => {
     e.stopPropagation(); // Prevent event from bubbling up
-    navigate(`/UB2024-APP/edit/${id}`);
+    navigate(`/UB2024-APP2/edit/${id}`);
   };
 
   const handleImport = (e) => {
@@ -164,13 +164,13 @@ const QuestionsList = ({
 
   // New function to handle redirection on click
   const handleQuestionClick = (id) => {
-    navigate(`/UB2024-APP/question/${id}`);
+    navigate(`/UB2024-APP2/question/${id}`);
   };
 
   return (
     <div className="questions-list">
       <div className="header">
-        <button onClick={() => navigate('/UB2024-APP/')}>
+        <button onClick={() => navigate('/UB2024-APP2/')}>
           <FontAwesomeIcon icon={faArrowLeft} className='back-button'/>
         </button>
         <div className="menu-container">
@@ -204,7 +204,7 @@ const QuestionsList = ({
           style={{ display: 'none' }}
         />
         <button onClick={handleClearAll} className="clear-button">Clear All</button>
-        <button onClick={() => navigate('/UB2024-APP/add')} className="add-button">Add</button>
+        <button onClick={() => navigate('/UB2024-APP2/add')} className="add-button">Add</button>
         <button onClick={() => handleSort('number')} className="filter-button">Sort by: Number</button>
         <button onClick={() => handleSort('kategoria')} className="filter-button">Kategoria</button>
         <button onClick={() => handleSort('zestaw')} className="filter-button">Zestaw</button>

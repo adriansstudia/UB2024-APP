@@ -69,7 +69,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
     const currentIndex = sortedAndFilteredQuestions.findIndex(q => q.id === question.id);
     const previousQuestion = sortedAndFilteredQuestions[currentIndex - 1];
     if (previousQuestion) {
-      navigate(`/UB2024-APP/question/${previousQuestion.id}`);
+      navigate(`/UB2024-APP2/question/${previousQuestion.id}`);
     }
   };
 
@@ -77,13 +77,13 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
     const currentIndex = sortedAndFilteredQuestions.findIndex(q => q.id === question.id);
     const nextQuestion = sortedAndFilteredQuestions[currentIndex + 1];
     if (nextQuestion) {
-      navigate(`/UB2024-APP/question/${nextQuestion.id}`);
+      navigate(`/UB2024-APP2/question/${nextQuestion.id}`);
     }
   };
 
   return (
     <div className="question-detail">
-      <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
+      <button className="back-button" onClick={() => navigate('/UB2024-APP2/questions')}>
         <FontAwesomeIcon icon={faArrowLeft} />
       </button>
 
