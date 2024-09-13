@@ -103,7 +103,38 @@ const QuestionsList = ({
     });
   };
   
+  // Update handleImport to accept CSV text
+  const handleImportFromText = (csvText) => {
+    Papa.parse(csvText, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (result) => {
+        console.log('Parsed data:', result.data);
+        const importedQuestions = result.data.map((row) => ({
+          id: uuidv4(),
+          number: row['number'] || '',
+          question: row['question'] || '',
+          kategoria: row['kategoria'] || '',
+          zestaw: row['zestaw'] || '',
+          rating: row['rating'] || '',
+          answer: row['answer'] || '',
+        }));
+        console.log('Imported questions:', importedQuestions);
+        addQuestions(importedQuestions);
+      },
+      error: (error) => {
+        console.error('Error parsing CSV:', error);
+      },
+    });
+  };
 
+  // New function to load the default CSV from URL
+  const handleLoadDefaultCSV = () => {
+    fetch('https://raw.githubusercontent.com/adriansstudia/UB2024-APP/main/output.csv')
+      .then((response) => response.text())
+      .then((csvText) => handleImportFromText(csvText))
+      .catch((error) => console.error('Error loading default CSV:', error));
+  };
 
   const handleSaveState = () => {
     console.log('Save State clicked');
@@ -197,6 +228,7 @@ const QuestionsList = ({
           onChange={handleImport}
           style={{ display: 'none' }}
         />
+        <button onClick={handleLoadDefaultCSV} className="load-default-button">Load Default</button>
         <button onClick={handleClearAll} className="clear-button">Clear All</button>
         <button onClick={() => navigate('/UB2024-APP/add')} className="add-button">Add</button>
         <button onClick={() => handleSort('number')} className="filter-button">Sort by: Number</button>
