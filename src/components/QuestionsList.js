@@ -10,7 +10,7 @@ const QuestionsList = ({
   questions,
   deleteQuestion,
   addQuestions,
-  clearAllQuestions, // Add this prop
+  clearAllQuestions, 
   sortBy,
   setSortBy,
   filterBy,
@@ -20,7 +20,7 @@ const QuestionsList = ({
   const [kategoriaOptions, setKategoriaOptions] = useState([]);
   const [showMenu, setShowMenu] = useState(false);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
-  const [questionsToDelete, setQuestionsToDelete] = useState(0); // Store count of questions
+  const [questionsToDelete, setQuestionsToDelete] = useState(0); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,11 +40,11 @@ const QuestionsList = ({
       // Apply sorting
       if (sortBy) {
         updatedQuestions = [...updatedQuestions].sort((a, b) => {
-          if (a[sortBy] === undefined || b[sortBy] === undefined) return 0; // Handle undefined values
+          if (a[sortBy] === undefined || b[sortBy] === undefined) return 0;
           if (typeof a[sortBy] === 'string') {
             return a[sortBy].localeCompare(b[sortBy]);
           }
-          return a[sortBy] - b[sortBy]; // For numeric values
+          return a[sortBy] - b[sortBy];
         });
       }
 
@@ -63,23 +63,22 @@ const QuestionsList = ({
   };
 
   const handleDelete = (id, e) => {
-    e.stopPropagation(); // Prevent event from bubbling up
+    e.stopPropagation();
     deleteQuestion(id);
   };
 
   const handleEdit = (id, e) => {
-    e.stopPropagation(); // Prevent event from bubbling up
+    e.stopPropagation();
     navigate(`/UB2024-APP/edit/${id}`);
   };
 
-  const handleImport = (fileContent) => {
-    Papa.parse(fileContent, {
-      header: true, // Ensure headers are used
+  const handleImport = (csvText) => {
+    Papa.parse(csvText, {
+      header: true,
       skipEmptyLines: true,
       complete: (result) => {
-        console.log('Parsed data:', result.data); // Log the parsed data
         const importedQuestions = result.data.map((row) => ({
-          id: uuidv4(), // Use UUID for unique IDs
+          id: uuidv4(),
           number: row['number'] || '',
           question: row['question'] || '',
           kategoria: row['kategoria'] || '',
@@ -87,7 +86,6 @@ const QuestionsList = ({
           rating: row['rating'] || '',
           answer: row['answer'] || '',
         }));
-        console.log('Imported questions:', importedQuestions); // Log the imported questions
         addQuestions(importedQuestions);
       },
       error: (error) => {
@@ -96,13 +94,10 @@ const QuestionsList = ({
     });
   };
 
-  // New function to load the default CSV from URL
   const handleLoadDefaultCSV = () => {
     fetch('https://raw.githubusercontent.com/adriansstudia/UB2024-APP/main/output.csv')
       .then((response) => response.text())
-      .then((csvText) => {
-        handleImport(csvText);
-      })
+      .then((csvText) => handleImport(csvText))
       .catch((error) => console.error('Error loading default CSV:', error));
   };
 
@@ -115,30 +110,38 @@ const QuestionsList = ({
   };
 
   const handleClearAll = () => {
-    setQuestionsToDelete(filteredQuestions.length); // Set total questions to delete
-    setShowConfirmPopup(true); // Show confirmation popup
+    setQuestionsToDelete(filteredQuestions.length);
+    setShowConfirmPopup(true);
   };
 
   const confirmClearAll = (confirm) => {
     if (confirm) {
-      clearAllQuestions(); // Call the function to clear all questions
+      clearAllQuestions();
     }
-    setShowConfirmPopup(false); // Hide confirmation popup
+    setShowConfirmPopup(false);
   };
 
   const saveToCSV = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const filename = `UB2024_${year}_${month}_${day}_${hours}_${minutes}.csv`;
+
     const csv = Papa.unparse(questions, {
       header: true,
       delimiter: ";",
       columns: ["number", "question", "kategoria", "zestaw", "rating", "answer"]
     });
-    
+
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    
+
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'questions.csv');
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -168,7 +171,7 @@ const QuestionsList = ({
                 type="file"
                 id="load-state-input"
                 accept=".csv"
-                onChange={(e) => handleImport(e.target.files[0])}
+                onChange={handleImport}
                 style={{ display: 'none' }}
               />
             </div>
@@ -186,11 +189,11 @@ const QuestionsList = ({
         />
         <button onClick={handleClearAll} className="clear-button">Clear All</button>
         <button onClick={() => navigate('/UB2024-APP/add')} className="add-button">Add</button>
+        <button onClick={handleLoadDefaultCSV} className="load-button">Load Default</button>
         <button onClick={() => handleSort('number')} className="filter-button">Sort by: Number</button>
         <button onClick={() => handleSort('kategoria')} className="filter-button">Kategoria</button>
         <button onClick={() => handleSort('zestaw')} className="filter-button">Zestaw</button>
         <button onClick={() => handleSort('rating')} className="filter-button">Rating</button>
-        <button onClick={handleLoadDefaultCSV} className="filter-button">Load Default CSV</button>
       </div>
       <div className="filter-options">
         <select onChange={(e) => handleFilter(e.target.value)} value={filterBy}>
@@ -228,10 +231,10 @@ const QuestionsList = ({
               <div className="column">{question.zestaw}</div>
               <div className="column">{question.rating}</div>
               <div className="actions">
-                <button className="action-button edit-button" onClick={(e) => handleEdit(question.id, e)}>
+                <button className="edit-button" onClick={(e) => handleEdit(question.id, e)}>
                   <FontAwesomeIcon icon={faEdit} />
                 </button>
-                <button className="action-button delete-button" onClick={(e) => handleDelete(question.id, e)}>
+                <button className="delete-button" onClick={(e) => handleDelete(question.id, e)}>
                   <FontAwesomeIcon icon={faTrashAlt} />
                 </button>
               </div>
@@ -241,11 +244,9 @@ const QuestionsList = ({
       </div>
       {showConfirmPopup && (
         <div className="confirm-popup">
-          <div className="confirm-popup-content">
-            <p>Do you want to remove all {questionsToDelete} questions?</p>
-            <button onClick={() => confirmClearAll(true)} className="confirm-button">Yes</button>
-            <button onClick={() => confirmClearAll(false)} className="confirm-button">No</button>
-          </div>
+          <p>Do you want to remove all the questions? This action will delete {questionsToDelete} questions.</p>
+          <button onClick={() => confirmClearAll(true)} className="confirm-button">Yes</button>
+          <button onClick={() => confirmClearAll(false)} className="confirm-button">No</button>
         </div>
       )}
     </div>
