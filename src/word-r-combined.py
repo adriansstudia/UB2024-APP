@@ -5,6 +5,9 @@ import re
 import csv
 from bs4 import BeautifulSoup
 
+# Base URL for linking to the images on GitHub Pages
+IMAGE_BASE_URL = 'https://adriansstudia.github.io/UB2024-APP/images'
+
 def extract_images(input_docx, image_dir='images'):
     doc = Document(input_docx)
     if not os.path.exists(image_dir):
@@ -18,11 +21,12 @@ def extract_images(input_docx, image_dir='images'):
             image_name = f'image_{len(image_files) + 1}.{image_ext}'
             image_path = os.path.join(image_dir, image_name)
             
+            # Save the image to the local directory
             with open(image_path, 'wb') as img_file:
                 img_file.write(image_data)
             
-            # Save the full path with the new URL directory
-            image_url = f'https://adriansstudia.github.io/UB2024-APP/{image_dir}/{image_name}'
+            # Append the image reference and the URL for the CSV
+            image_url = f'{IMAGE_BASE_URL}/{image_name}'
             image_files.append((rel.target_ref, image_url))
     
     return image_files
@@ -32,17 +36,14 @@ def convert_docx_to_html(input_docx):
     pypandoc.convert_file(input_docx, 'html', outputfile=output_html, extra_args=['--from=docx', '--to=html'])
     return output_html
 
-def split_cell_content(cell_text):
-    # Split cell content by `|` and move the content to next columns
-    parts = cell_text.split('|')
-    return parts
-
 def extract_images_and_text(cell, image_files):
     html_content = str(cell)
-    for ref, url in image_files:
+    for ref, image_url in image_files:
         if ref in html_content:
-            # Replace the local path with the URL path
-            html_content = html_content.replace(ref, url)
+            # Replace the image reference with the URL for the CSV file
+            html_content = html_content.replace(ref, image_url)
+    
+    # If the content includes an image, return it as HTML, otherwise plain text
     if '<img' in html_content:
         return html_content
     else:
@@ -63,19 +64,10 @@ def adjust_table_cells(html_file, image_files):
             adjusted_row = []
             for cell in cells:
                 cell_html = extract_images_and_text(cell, image_files)
-                if '|' in cell_html:
-                    cell_parts = split_cell_content(cell_html)
-                    adjusted_row.extend(cell_parts)
-                else:
-                    adjusted_row.append(cell_html)
+                adjusted_row.append(cell_html)
             table_adjusted.append(adjusted_row)
     
     return table_adjusted
-
-def remove_html_tags(text):
-    """Remove HTML tags from text."""
-    clean = re.compile('<.*?>')
-    return re.sub(clean, '', text)
 
 def create_docx_from_adjusted_table(table_html, output_docx):
     doc = Document()
@@ -107,39 +99,6 @@ def create_docx_from_adjusted_table(table_html, output_docx):
     
     doc.save(output_docx)
 
-def rearrange_table_columns(input_docx, output_docx, new_order):
-    doc = Document(input_docx)
-    new_doc = Document()
-
-    for table in doc.tables:
-        # Create a new table with the same number of rows and columns
-        num_rows = len(table.rows)
-        num_cols = len(table.rows[0].cells)
-        new_table = new_doc.add_table(rows=num_rows, cols=num_cols)
-
-        # Create a mapping for the current column indices
-        header_cells = [cell.text for cell in table.rows[0].cells]
-        col_mapping = {header: index for index, header in enumerate(header_cells)}
-
-        # Create a new header row based on new_order
-        header_row = new_table.rows[0]
-        for i, header in enumerate(new_order):
-            header_row.cells[i].text = header
-
-        # Copy data into the new table with the new column order
-        for row_index, row in enumerate(table.rows):
-            if row_index == 0:
-                continue  # Skip the header row, already handled
-            new_row = new_table.rows[row_index]
-            for col_index, header in enumerate(new_order):
-                old_col_index = col_mapping.get(header, None)
-                if old_col_index is not None:
-                    new_row.cells[col_index].text = row.cells[old_col_index].text
-                else:
-                    new_row.cells[col_index].text = ''
-
-    new_doc.save(output_docx)
-
 def save_table_as_csv(docx_file, csv_file, delimiter=';'):
     doc = Document(docx_file)
     table = doc.tables[0]  # Assuming only one table in the document
@@ -152,43 +111,20 @@ def save_table_as_csv(docx_file, csv_file, delimiter=';'):
             writer.writerow(row_data)
 
 def process_docx(input_docx, temp_output_docx, final_output_docx, csv_file):
+    # Extract images and replace with URL in the CSV
     image_files = extract_images(input_docx)
+    
+    # Convert DOCX to HTML
     html_file = convert_docx_to_html(input_docx)
+    
+    # Adjust the table cells and add image links
     table_adjusted = adjust_table_cells(html_file, image_files)
+    
+    # Create the DOCX from adjusted table content
     create_docx_from_adjusted_table(table_adjusted, temp_output_docx)
     
-    # Remove HTML tags from cells that do not contain images
-    final_doc = Document(temp_output_docx)
-    new_doc = Document()
-    
-    for table in final_doc.tables:
-        # Create a new table with the same number of rows and columns
-        num_cols = len(table.rows[0].cells) if table.rows else 0
-        new_table = new_doc.add_table(rows=0, cols=num_cols)
-
-        for row in table.rows:
-            new_row = new_table.add_row()
-            for i, cell in enumerate(row.cells):
-                if i >= len(new_row.cells):
-                    # Ensure the new row has enough cells
-                    new_row.add_cell()
-                # Check if cell contains HTML (likely with images)
-                if '<img' in cell.text:
-                    # Copy the cell content as is if it contains images
-                    new_row.cells[i].text = cell.text
-                else:
-                    # Remove HTML tags if no images are present
-                    clean_text = remove_html_tags(cell.text)
-                    new_row.cells[i].text = clean_text
-
-    new_doc.save(temp_output_docx)
-    
-    # Rearrange columns in the final output
-    new_order = ["number", "question", "kategoria", "zestaw", "rating", "answer"]
-    rearrange_table_columns(temp_output_docx, final_output_docx, new_order)
-    
     # Save the rearranged table as CSV
-    save_table_as_csv(final_output_docx, csv_file)
+    save_table_as_csv(temp_output_docx, csv_file)
     
     # Clean up temporary HTML file
     os.remove(html_file)
@@ -196,6 +132,5 @@ def process_docx(input_docx, temp_output_docx, final_output_docx, csv_file):
 if __name__ == "__main__":
     input_docx = 'input.docx'
     temp_output_docx = 'temp_output.docx'
-    final_output_docx = 'rearranged_output.docx'
     csv_file = 'output.csv'
-    process_docx(input_docx, temp_output_docx, final_output_docx, csv_file)
+    process_docx(input_docx, temp_output_docx, temp_output_docx, csv_file)
