@@ -43,7 +43,7 @@ budynku.<br/>
 Ciężka izolacja przeciwwilgociowa – przy wysokim poziomie wód
 gruntowych. Np. izolacja przeciwwodna z folii zgrzewanej lub
 samoprzylepnej.</p>
-<p><img src=""adriansstudia.github.io/UB2024-APP/images\image_7.png"" style=""width:1.90576in;height:1.60091in""/></p>
+<p><img src=""https://adriansstudia.github.io/UB2024-APP/images/image_7.png"" style=""width:1.90576in;height:1.60091in""/></p>
 <p>membranę kubełkową zazwyczaj układa się wytłoczeniami skierowanymi w
 kierunku ściany fundamentowej</p></th>"
 10;"Co
@@ -56,7 +56,37 @@ operaty geodezyjne i książkę obmiarów, a w przypadku realizacji obiektów
 metodą montażu – także dziennik montażu."
 12;"Gdzie
 i dlaczego stosuje się wentylację grawitacyjną? Jakie przepisy regulują
-zasady jej realizacji i sposób wykonania?";P;Z5;T;
+zasady jej realizacji i sposób wykonania?";P;Z5;T;"WT Rozdział 6 Wentylacja i klimatyzacja § 147
+- wentylację grawitacyjną lub mechaniczną należy zapewnić w
+pomieszczeniach przeznaczonych na pobyt ludzi, bez otwieranych okien, a
+także w tych w których ze względu na technologicznie, zdrowotne
+bezpieczeństwa jest wymagane.
+-Strumień powietrza zew doprowadzanego do pomieszczeń niebędących
+pomieszczeniami pracy powinien odpowiadać PN ale nie mniejszy niż 20m3/h
+na osobę na pobyt stały.
+- czerpnia min 0,4m powyżej nawierzchni w jakiej się znajduje oraz co
+najmniej 6 m od wywiewek kanalizacyjnych
+Polskie Normy regulują zasady i sposób wykonania
+ChatGPT:
+Wentylację grawitacyjną stosuje się przede wszystkim w budynkach
+mieszkalnych, zwłaszcza w starszych budynkach oraz w pomieszczeniach,
+gdzie nie ma dużych obciążeń cieplnych ani wilgotnościowych, jak
+kuchnie, łazienki, toalety oraz pomieszczenia gospodarcze.
+dnia 7 lipca 1994 r. – Prawo budowlane, budynek musi być wyposażony w
+urządzenia wentylacyjne zapewniające odpowiednią jakość powietrza
+wewnętrznego.
+Rozporządzenie Ministra Infrastruktury z dnia 12 kwietnia 2002 r. w
+sprawie warunków technicznych, jakim powinny odpowiadać budynki i ich
+usytuowanie. Szczególnie załącznik dotyczący wentylacji i klimatyzacji,
+gdzie określono, że w pomieszczeniach przeznaczonych na pobyt ludzi musi
+być zapewniona wymiana powietrza, a w pomieszczeniach sanitarnych musi
+być stosowana wentylacja wywiewna.
+Norma
+postaci nawiewników okiennych lub ściennych, zapewniające dopływ
+świeżego powietrza.
+Wentylacja grawitacyjna jest efektywna, gdy różnica temperatur między
+wnętrzem a zewnętrzem jest wystarczająca, co sprawia, że działa
+najlepiej w chłodniejszych porach roku."
 13;"Proszę
 omówić problematykę usytuowania miejsc do gromadzenia odpadów stałych,
 wypowiedź ilustrując szkicami.";P;Z5;N;"WT Rozdział 4 Miejsce gromadzenia odpadów stałych §22
@@ -114,7 +144,19 @@ szkicami.";P;Z8;;"- parking z wyznaczonymi miejscami dla osób NPS na poziomie t
 lub na kondygnacjach dostępnych dla tych osób z pochylni ( odcinki
 długości max 9m)
 - miejsce odpoczynku NPS ( miejsce 1,5x1,5) przy ławkach nie będące
-komunikacją, bez żadnego w"
+komunikacją, bez żadnego wyposażenia.
+- windy między poziomami ( przyciski z wypustkami, komunikaty
+głosowe)
+- nawierzchnie kierunkowe w kontrastującym kolorze
+- tabliczki kierunkowe na poręczach
+- stanowisko kas biletowych dostosowane do osób na wózku.
+- mapa dotykowa (sensoryczna)
+- osoby niewidome – oznakowania dźwiękowe i dotykowe (stacje sos)
+- wyznaczone miejsce dla NPS z miejscem gdzie zatrzyma się wagon
+- dostosowane toalety
+- drzwi przesuwne ( drzwi ewakuacyjne z klamką antypaniczną na wysokości
+nps)
++PPOŻ"
 17;"Jakie
 warunki muszą zostać spełnione aby możliwe było wydanie decyzji o
 warunkach zabudowy?";L;Z8;;"Ustawa o planowaniu i zagospodarowaniu przestrzennym Art. 61
@@ -164,7 +206,7 @@ cementu i preparatu<br/>
 polimerowego łączy zalety obu rozwiązań, dobre w budynkach w których
 mamy do czynienia z wodą<br/>
 Posadzka ceramiczna</p>
-<p><img src=""adriansstudia.github.io/UB2024-APP/images\image_5.png"" style=""width:2.28338in;height:1.10308in""/></p>
+<p><img src=""https://adriansstudia.github.io/UB2024-APP/images/image_5.png"" style=""width:2.28338in;height:1.10308in""/></p>
 <ol type=""1"">
 <li><p>Warstwa przerywająca podciąganie kapilarne – żwir płukany
 8-16mm</p></li>
@@ -293,7 +335,7 @@ systemu ostrzegawczego;"
 omówić i zilustrować szkicami sposoby rozwiązania stropów nad obiektami
 wielkopowierzchniowymi (np. galerie)";P;Z15;;"<strong>WRÓCIĆ</strong></h2>
 <blockquote>
-<p><img src=""adriansstudia.github.io/UB2024-APP/images\image_3.png"" style=""width:2.375in;height:2.52778in""/></p>
+<p><img src=""https://adriansstudia.github.io/UB2024-APP/images/image_3.png"" style=""width:2.375in;height:2.52778in""/></p>
 </blockquote>
 <p>Stop oparty na kratownicy<br/>
 Strop z strunobetonu</p>
@@ -418,7 +460,7 @@ powierzchnia wewnętrzna – suma powierzchni wszystkich kondygnacji
 budynku, mierzona po wewnętrznym obrysie przegród zewnętrznych, bez
 pomniejszenia o przegrody wewnętrzne, ale z wyliczeniem pow
 antresoli.</p>
-<p><img src=""adriansstudia.github.io/UB2024-APP/images\image_1.png"" style=""width:3.20005in;height:3.35773in""/></p></th>"
+<p><img src=""https://adriansstudia.github.io/UB2024-APP/images/image_1.png"" style=""width:3.20005in;height:3.35773in""/></p></th>"
 36;"Proszę
 naszkicować przykładowe rozwiązanie mieszkania 3 pokojowego w budynku
 mieszkalnym wielorodzinnym a następnie omówić zagadnienia
@@ -494,7 +536,7 @@ Szerokość stopni zewnętrznych w UP i MW co najmniej 0,35m"
 43;"Proszę
 omówić rodzaje i sposoby rozwiązania tzw. zielonych dachów, wypowiedź
 ilustrując szkicami";P;Z23;;"</h2>
-<p><img src=""adriansstudia.github.io/UB2024-APP/images\image_9.png"" style=""width:2.33651in;height:3.03492in""/></p></th>"
+<p><img src=""https://adriansstudia.github.io/UB2024-APP/images/image_9.png"" style=""width:2.33651in;height:3.03492in""/></p></th>"
 44;"Realizacja
 jakiś obiektów wymaga zgłoszenie do właściwego organu, w jakim terminie
 i co należy określić w zgłoszeniu?";L;Z23;;"Ustawa Prawo Budowlane Art. 29, 30
@@ -539,10 +581,10 @@ budynków użyteczności publicznej, ilustrując wypowiedź
 szkicami.";P;Z24;;"</h2>
 <p>Elewacja wentylowana – np. z płyty włókno cementowej albo HPL
 (elementy laminowane) lub Okładzina ceramiczna</p>
-<p>Ściana osłonowa, kurtynowa -<img src=""adriansstudia.github.io/UB2024-APP/images\image_8.png"" style=""width:2.46314in;height:2.15893in""/></p>
-<p><img src=""adriansstudia.github.io/UB2024-APP/images\image_6.png"" style=""width:2.3262in;height:2.48918in""/></p>
+<p>Ściana osłonowa, kurtynowa -<img src=""https://adriansstudia.github.io/UB2024-APP/images/image_8.png"" style=""width:2.46314in;height:2.15893in""/></p>
+<p><img src=""https://adriansstudia.github.io/UB2024-APP/images/image_6.png"" style=""width:2.3262in;height:2.48918in""/></p>
 <p>Płyty warstwowe –</p>
-<p><img src=""adriansstudia.github.io/UB2024-APP/images\image_4.png"" style=""width:2.47203in;height:2.14468in""/></p></th>"
+<p><img src=""https://adriansstudia.github.io/UB2024-APP/images/image_4.png"" style=""width:2.47203in;height:2.14468in""/></p></th>"
 48;"Jakie
 roboty nie wymagają decyzji o ustaleniu warunków zabudowy w przypadku
 braku planu miejscowego?";L;Z24;;WRÓCIĆ
@@ -640,7 +682,7 @@ wielorodzinnych.";L;Z31;;Aaaa
 naszkicować przykładowe rozwiązanie pomieszczenia
 higieniczno-sanitarnego dla osób niepełnosprawnych i na jego przykładzie
 omówić problematykę projektowania takich miejsc.";P;Z31;;"</h2>
-<p><img src=""adriansstudia.github.io/UB2024-APP/images\image_2.png"" style=""width:2.36672in;height:2.34883in""/></p></th>"
+<p><img src=""https://adriansstudia.github.io/UB2024-APP/images/image_2.png"" style=""width:2.36672in;height:2.34883in""/></p></th>"
 64;"Proszę
 omówić wymagania dotyczące formy i zakresu strony tytułowej projektu
 budowlanego.";L;Z31;;Jak w zestawie 25.

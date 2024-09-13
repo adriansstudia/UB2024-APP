@@ -22,7 +22,7 @@ def extract_images(input_docx, image_dir='images'):
                 img_file.write(image_data)
             
             # Save the full path with the new URL directory
-            image_url = f'https://username.github.io/UB2024-APP/{image_dir}/{image_name}'
+            image_url = f'https://adriansstudia.github.io/UB2024-APP/{image_dir}/{image_name}'
             image_files.append((rel.target_ref, image_url))
     
     return image_files
