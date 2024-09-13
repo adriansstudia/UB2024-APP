@@ -69,14 +69,11 @@ const QuestionsList = ({
 
   const handleEdit = (id, e) => {
     e.stopPropagation(); // Prevent event from bubbling up
-    navigate(`/UB2024-APP2/edit/${id}`);
+    navigate(`/UB2024-APP/edit/${id}`);
   };
 
-  const handleImport = (e) => {
-    const fileInput = e.target;
-    const file = fileInput.files[0];
-    
-    Papa.parse(file, {
+  const handleImport = (fileContent) => {
+    Papa.parse(fileContent, {
       header: true, // Ensure headers are used
       skipEmptyLines: true,
       complete: (result) => {
@@ -92,24 +89,22 @@ const QuestionsList = ({
         }));
         console.log('Imported questions:', importedQuestions); // Log the imported questions
         addQuestions(importedQuestions);
-        
-        // Reset the file input field
-        fileInput.value = null;
       },
       error: (error) => {
         console.error('Error parsing CSV:', error);
       },
     });
   };
-  
 
-  useEffect(() => {
-    // Load the default CSV file when the component mounts
+  // New function to load the default CSV from URL
+  const handleLoadDefaultCSV = () => {
     fetch('https://raw.githubusercontent.com/adriansstudia/UB2024-APP/main/output.csv')
-      .then(response => response.blob())
-      .then(blob => handleImport(blob))
-      .catch(error => console.error('Error loading default CSV file:', error));
-  }, []);
+      .then((response) => response.text())
+      .then((csvText) => {
+        handleImport(csvText);
+      })
+      .catch((error) => console.error('Error loading default CSV:', error));
+  };
 
   const handleSaveState = () => {
     console.log('Save State clicked');
@@ -132,45 +127,31 @@ const QuestionsList = ({
   };
 
   const saveToCSV = () => {
-    // Generate current date and time
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    
-    // Format the filename
-    const filename = `UB2024_${year}_${month}_${day}_${hours}_${minutes}.csv`;
-  
-    // Convert questions data to CSV format
     const csv = Papa.unparse(questions, {
       header: true,
       delimiter: ";",
       columns: ["number", "question", "kategoria", "zestaw", "rating", "answer"]
     });
     
-    // Create a blob and download the CSV file
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', filename);
+    link.setAttribute('download', 'questions.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  // New function to handle redirection on click
   const handleQuestionClick = (id) => {
-    navigate(`/UB2024-APP2/question/${id}`);
+    navigate(`/UB2024-APP/question/${id}`);
   };
 
   return (
     <div className="questions-list">
       <div className="header">
-        <button onClick={() => navigate('/UB2024-APP2/')}>
+        <button onClick={() => navigate('/UB2024-APP/')}>
           <FontAwesomeIcon icon={faArrowLeft} className='back-button'/>
         </button>
         <div className="menu-container">
@@ -187,7 +168,7 @@ const QuestionsList = ({
                 type="file"
                 id="load-state-input"
                 accept=".csv"
-                onChange={handleImport}
+                onChange={(e) => handleImport(e.target.files[0])}
                 style={{ display: 'none' }}
               />
             </div>
@@ -200,15 +181,16 @@ const QuestionsList = ({
           type="file"
           id="import-file"
           accept=".csv"
-          onChange={handleImport}
+          onChange={(e) => handleImport(e.target.files[0])}
           style={{ display: 'none' }}
         />
         <button onClick={handleClearAll} className="clear-button">Clear All</button>
-        <button onClick={() => navigate('/UB2024-APP2/add')} className="add-button">Add</button>
+        <button onClick={() => navigate('/UB2024-APP/add')} className="add-button">Add</button>
         <button onClick={() => handleSort('number')} className="filter-button">Sort by: Number</button>
         <button onClick={() => handleSort('kategoria')} className="filter-button">Kategoria</button>
         <button onClick={() => handleSort('zestaw')} className="filter-button">Zestaw</button>
         <button onClick={() => handleSort('rating')} className="filter-button">Rating</button>
+        <button onClick={handleLoadDefaultCSV} className="filter-button">Load Default CSV</button>
       </div>
       <div className="filter-options">
         <select onChange={(e) => handleFilter(e.target.value)} value={filterBy}>
@@ -228,7 +210,6 @@ const QuestionsList = ({
           <div className="column">Kat.</div>
           <div className="column">Zest.</div>
           <div className="column">Rat.</div>
-
         </div>
         <div className="question-info">
           <p>Total Questions: {filteredQuestions.length}</p>
