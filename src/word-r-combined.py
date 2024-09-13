@@ -21,7 +21,9 @@ def extract_images(input_docx, image_dir='images'):
             with open(image_path, 'wb') as img_file:
                 img_file.write(image_data)
             
-            image_files.append((rel.target_ref, image_path))
+            # Save the full path with the new URL directory
+            image_url = f'https://username.github.io/UB2024-APP/{image_dir}/{image_name}'
+            image_files.append((rel.target_ref, image_url))
     
     return image_files
 
@@ -37,9 +39,10 @@ def split_cell_content(cell_text):
 
 def extract_images_and_text(cell, image_files):
     html_content = str(cell)
-    for ref, path in image_files:
+    for ref, url in image_files:
         if ref in html_content:
-            html_content = html_content.replace(ref, os.path.join('images', os.path.basename(path)))
+            # Replace the local path with the URL path
+            html_content = html_content.replace(ref, url)
     if '<img' in html_content:
         return html_content
     else:
