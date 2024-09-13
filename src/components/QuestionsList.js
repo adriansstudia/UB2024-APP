@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Papa from 'papaparse';
@@ -10,7 +11,7 @@ const QuestionsList = ({
   questions,
   deleteQuestion,
   addQuestions,
-  clearAllQuestions, 
+  clearAllQuestions, // Add this prop
   sortBy,
   setSortBy,
   filterBy,
@@ -20,7 +21,7 @@ const QuestionsList = ({
   const [kategoriaOptions, setKategoriaOptions] = useState([]);
   const [showMenu, setShowMenu] = useState(false);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
-  const [questionsToDelete, setQuestionsToDelete] = useState(0); 
+  const [questionsToDelete, setQuestionsToDelete] = useState(0); // Store count of questions
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,11 +41,11 @@ const QuestionsList = ({
       // Apply sorting
       if (sortBy) {
         updatedQuestions = [...updatedQuestions].sort((a, b) => {
-          if (a[sortBy] === undefined || b[sortBy] === undefined) return 0;
+          if (a[sortBy] === undefined || b[sortBy] === undefined) return 0; // Handle undefined values
           if (typeof a[sortBy] === 'string') {
             return a[sortBy].localeCompare(b[sortBy]);
           }
-          return a[sortBy] - b[sortBy];
+          return a[sortBy] - b[sortBy]; // For numeric values
         });
       }
 
@@ -63,22 +64,26 @@ const QuestionsList = ({
   };
 
   const handleDelete = (id, e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Prevent event from bubbling up
     deleteQuestion(id);
   };
 
   const handleEdit = (id, e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Prevent event from bubbling up
     navigate(`/UB2024-APP/edit/${id}`);
   };
 
-  const handleImport = (csvText) => {
-    Papa.parse(csvText, {
-      header: true,
+  const handleImport = (e) => {
+    const fileInput = e.target;
+    const file = fileInput.files[0];
+    
+    Papa.parse(file, {
+      header: true, // Ensure headers are used
       skipEmptyLines: true,
       complete: (result) => {
+        console.log('Parsed data:', result.data); // Log the parsed data
         const importedQuestions = result.data.map((row) => ({
-          id: uuidv4(),
+          id: uuidv4(), // Use UUID for unique IDs
           number: row['number'] || '',
           question: row['question'] || '',
           kategoria: row['kategoria'] || '',
@@ -86,20 +91,26 @@ const QuestionsList = ({
           rating: row['rating'] || '',
           answer: row['answer'] || '',
         }));
+        console.log('Imported questions:', importedQuestions); // Log the imported questions
         addQuestions(importedQuestions);
+        
+        // Reset the file input field
+        fileInput.value = null;
       },
       error: (error) => {
         console.error('Error parsing CSV:', error);
       },
     });
   };
+  
 
-  const handleLoadDefaultCSV = () => {
+  useEffect(() => {
+    // Load the default CSV file when the component mounts
     fetch('https://raw.githubusercontent.com/adriansstudia/UB2024-APP/main/output.csv')
-      .then((response) => response.text())
-      .then((csvText) => handleImport(csvText))
-      .catch((error) => console.error('Error loading default CSV:', error));
-  };
+      .then(response => response.blob())
+      .then(blob => handleImport(blob))
+      .catch(error => console.error('Error loading default CSV file:', error));
+  }, []);
 
   const handleSaveState = () => {
     console.log('Save State clicked');
@@ -110,35 +121,40 @@ const QuestionsList = ({
   };
 
   const handleClearAll = () => {
-    setQuestionsToDelete(filteredQuestions.length);
-    setShowConfirmPopup(true);
+    setQuestionsToDelete(filteredQuestions.length); // Set total questions to delete
+    setShowConfirmPopup(true); // Show confirmation popup
   };
 
   const confirmClearAll = (confirm) => {
     if (confirm) {
-      clearAllQuestions();
+      clearAllQuestions(); // Call the function to clear all questions
     }
-    setShowConfirmPopup(false);
+    setShowConfirmPopup(false); // Hide confirmation popup
   };
 
   const saveToCSV = () => {
+    // Generate current date and time
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
     const day = String(now.getDate()).padStart(2, '0');
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    // Format the filename
     const filename = `UB2024_${year}_${month}_${day}_${hours}_${minutes}.csv`;
-
+  
+    // Convert questions data to CSV format
     const csv = Papa.unparse(questions, {
       header: true,
       delimiter: ";",
       columns: ["number", "question", "kategoria", "zestaw", "rating", "answer"]
     });
-
+    
+    // Create a blob and download the CSV file
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-
+    
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', filename);
@@ -147,6 +163,7 @@ const QuestionsList = ({
     document.body.removeChild(link);
   };
 
+  // New function to handle redirection on click
   const handleQuestionClick = (id) => {
     navigate(`/UB2024-APP/question/${id}`);
   };
@@ -184,12 +201,11 @@ const QuestionsList = ({
           type="file"
           id="import-file"
           accept=".csv"
-          onChange={(e) => handleImport(e.target.files[0])}
+          onChange={handleImport}
           style={{ display: 'none' }}
         />
         <button onClick={handleClearAll} className="clear-button">Clear All</button>
         <button onClick={() => navigate('/UB2024-APP/add')} className="add-button">Add</button>
-        <button onClick={handleLoadDefaultCSV} className="load-button">Load Default</button>
         <button onClick={() => handleSort('number')} className="filter-button">Sort by: Number</button>
         <button onClick={() => handleSort('kategoria')} className="filter-button">Kategoria</button>
         <button onClick={() => handleSort('zestaw')} className="filter-button">Zestaw</button>
@@ -213,6 +229,7 @@ const QuestionsList = ({
           <div className="column">Kat.</div>
           <div className="column">Zest.</div>
           <div className="column">Rat.</div>
+
         </div>
         <div className="question-info">
           <p>Total Questions: {filteredQuestions.length}</p>
@@ -231,10 +248,10 @@ const QuestionsList = ({
               <div className="column">{question.zestaw}</div>
               <div className="column">{question.rating}</div>
               <div className="actions">
-                <button className="edit-button" onClick={(e) => handleEdit(question.id, e)}>
+                <button className="action-button edit-button" onClick={(e) => handleEdit(question.id, e)}>
                   <FontAwesomeIcon icon={faEdit} />
                 </button>
-                <button className="delete-button" onClick={(e) => handleDelete(question.id, e)}>
+                <button className="action-button delete-button" onClick={(e) => handleDelete(question.id, e)}>
                   <FontAwesomeIcon icon={faTrashAlt} />
                 </button>
               </div>
@@ -244,9 +261,11 @@ const QuestionsList = ({
       </div>
       {showConfirmPopup && (
         <div className="confirm-popup">
-          <p>Do you want to remove all the questions? This action will delete {questionsToDelete} questions.</p>
-          <button onClick={() => confirmClearAll(true)} className="confirm-button">Yes</button>
-          <button onClick={() => confirmClearAll(false)} className="confirm-button">No</button>
+          <div className="confirm-popup-content">
+            <p>Do you want to remove all {questionsToDelete} questions?</p>
+            <button onClick={() => confirmClearAll(true)} className="confirm-button">Yes</button>
+            <button onClick={() => confirmClearAll(false)} className="confirm-button">No</button>
+          </div>
         </div>
       )}
     </div>
