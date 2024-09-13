@@ -105,7 +105,7 @@ const QuestionsList = ({
 
   useEffect(() => {
     // Load the default CSV file when the component mounts
-    fetch('https://adriansstudia.github.io/UB2024-APP/question/output_LP.csv')
+    fetch('https://raw.githubusercontent.com/adriansstudia/UB2024-APP/main/output.csv')
       .then(response => response.blob())
       .then(blob => handleImport(blob))
       .catch(error => console.error('Error loading default CSV file:', error));

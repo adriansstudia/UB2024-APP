@@ -5,7 +5,7 @@ import re
 import csv
 from bs4 import BeautifulSoup
 
-def extract_images(input_docx, image_dir='images', base_url='https://adriansstudia.github.io/UB2024-APP/images'):
+def extract_images(input_docx, image_dir='images', base_url='https://raw.githubusercontent.com/adriansstudia/UB2024-APP/main/images'):
     doc = Document(input_docx)
     if not os.path.exists(image_dir):
         os.makedirs(image_dir)
