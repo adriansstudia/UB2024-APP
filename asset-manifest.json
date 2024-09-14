@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/UB2024-APP/static/css/main.215d8670.css",
-    "main.js": "/UB2024-APP/static/js/main.a62573d6.js",
+    "main.css": "/UB2024-APP/static/css/main.c3483871.css",
+    "main.js": "/UB2024-APP/static/js/main.1b8da040.js",
     "static/media/fa-solid-900.ttf": "/UB2024-APP/static/media/fa-solid-900.07ed6d5fa32c1d54af0f.ttf",
     "static/media/fa-brands-400.ttf": "/UB2024-APP/static/media/fa-brands-400.0ff70dcbf135d859ebf3.ttf",
     "static/media/fa-solid-900.woff2": "/UB2024-APP/static/media/fa-solid-900.93f719f4d62bfa3e748c.woff2",
@@ -11,11 +11,11 @@
     "static/media/fa-v4compatibility.ttf": "/UB2024-APP/static/media/fa-v4compatibility.0f6cb412603527bda691.ttf",
     "static/media/fa-v4compatibility.woff2": "/UB2024-APP/static/media/fa-v4compatibility.6cfec8414be20e2c3426.woff2",
     "index.html": "/UB2024-APP/index.html",
-    "main.215d8670.css.map": "/UB2024-APP/static/css/main.215d8670.css.map",
-    "main.a62573d6.js.map": "/UB2024-APP/static/js/main.a62573d6.js.map"
+    "main.c3483871.css.map": "/UB2024-APP/static/css/main.c3483871.css.map",
+    "main.1b8da040.js.map": "/UB2024-APP/static/js/main.1b8da040.js.map"
   },
   "entrypoints": [
-    "static/css/main.215d8670.css",
-    "static/js/main.a62573d6.js"
+    "static/css/main.c3483871.css",
+    "static/js/main.1b8da040.js"
   ]
 }
