@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-
 import MainTab from './components/MainTab';
 import QuestionsList from './components/QuestionsList';
 import QuestionDetail from './components/QuestionDetail';
@@ -9,35 +8,29 @@ import './App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Papa from 'papaparse';
 
-
-// Key for saving to localStorage
-const LOCAL_STORAGE_KEY = 'UB2024_QuestionsData';
+// Replace with your API URL
+const API_URL = 'https://your-api-endpoint.example.com/questions';
 
 function App() {
   const [questions, setQuestions] = useState([]);
   const [sortBy, setSortBy] = useState('');
   const [filterBy, setFilterBy] = useState('');
 
-  // Load data from localStorage on first render
+  // Load data from API on first render
   useEffect(() => {
-    const storedQuestions = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (storedQuestions) {
-      setQuestions(JSON.parse(storedQuestions));
-    }
+    fetch(API_URL)
+      .then(response => response.json())
+      .then(data => {
+        setQuestions(data.questions || []);
+        setSortBy(data.sortBy || '');
+        setFilterBy(data.filterBy || '');
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
   }, []);
 
-  useEffect(() => {
-    const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (storedData) {
-      const { questions, sortBy, filterBy } = JSON.parse(storedData);
-      setQuestions(questions || []);
-      setSortBy(sortBy || '');
-      setFilterBy(filterBy || '');
-    }
-  }, []);
-  
-
-  // Save questions data to localStorage whenever the state changes
+  // Save questions data to API whenever the state changes
   useEffect(() => {
     if (questions.length > 0) {
       const dataToSave = {
@@ -45,10 +38,22 @@ function App() {
         sortBy,
         filterBy,
       };
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
+      fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSave),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Data saved:', data);
+      })
+      .catch(error => {
+        console.error('Error saving data:', error);
+      });
     }
   }, [questions, sortBy, filterBy]);
-  
 
   const addQuestions = (newQuestions) => {
     setQuestions([...questions, ...newQuestions]);
@@ -129,7 +134,21 @@ function App() {
             answer: row.answer
           }));
           setQuestions(newQuestions);
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newQuestions));
+          // Optionally save to API
+          fetch(API_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ questions: newQuestions }),
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Data saved:', data);
+          })
+          .catch(error => {
+            console.error('Error saving data:', error);
+          });
         },
         error: (error) => {
           console.error('Error reading CSV file:', error);
@@ -140,10 +159,21 @@ function App() {
 
   const clearAllQuestions = () => {
     setQuestions([]); // Clear the questions array
+    // Optionally clear data from API
+    fetch(API_URL, {
+      method: 'DELETE',
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Data cleared:', data);
+    })
+    .catch(error => {
+      console.error('Error clearing data:', error);
+    });
   };
   
   return (
-    <Router basename="/UB2024-APP">
+    <Router>
       <div className="App">
         <input
           type="file"
@@ -153,16 +183,16 @@ function App() {
           style={{ display: 'none' }}
         />
         <Routes>
-          <Route path="/" element={<Navigate to="/" replace />} />
-          <Route path="/" element={<MainTab />} />
+          <Route path="/" element={<Navigate to="/UB2024-APP/" replace />} />
+          <Route path="/UB2024-APP/" element={<MainTab />} />
           <Route
-            path="/questions"
+            path="/UB2024-APP/questions"
             element={
               <QuestionsList
                 questions={questions}
                 deleteQuestion={deleteQuestion}
                 addQuestions={addQuestions}
-                clearAllQuestions={clearAllQuestions}
+                clearAllQuestions={clearAllQuestions} // Pass clearAllQuestions function
                 sortBy={sortBy}
                 setSortBy={setSortBy}
                 filterBy={filterBy}
@@ -171,7 +201,7 @@ function App() {
             }
           />
           <Route
-            path="/question/:id"
+            path="/UB2024-APP/question/:id"
             element={
               <QuestionDetail
                 questions={questions}
@@ -182,7 +212,7 @@ function App() {
             }
           />
           <Route
-            path="/edit/:id"
+            path="/UB2024-APP/edit/:id"
             element={<EditQuestion questions={questions} saveQuestion={updateQuestion} />}
           />
         </Routes>
@@ -192,4 +222,3 @@ function App() {
 }
 
 export default App;
-
