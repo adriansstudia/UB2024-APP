@@ -1,18 +1,19 @@
-/* Base styles for all screen sizes */
+/* Base Styles */
 .questions-list {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   background-color: #f5f5f5;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: relative; /* To position the menu icon */
-  min-height: 100vh; /* Full viewport height */
+  position: relative;
+  min-height: 100vh;
 }
 
+/* Header */
 .header {
   display: flex;
-  flex-direction: column; /* Adjust for mobile */
-  align-items: flex-end; /* Adjust alignment */
+  flex-direction: column;
+  align-items: flex-end;
   margin-bottom: 20px;
 }
 
@@ -23,6 +24,7 @@
   color: #888;
   cursor: pointer;
 }
+
 .menu-icon {
   font-size: 20px;
   color: rgba(0, 0, 0, 0.7);
@@ -42,7 +44,6 @@
 }
 
 .menu-button {
-  
   font-size: 18px;
   display: block;
   background: transparent;
@@ -53,7 +54,7 @@
   cursor: pointer;
   color: #333;
   border-radius: 4px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .menu-button:hover {
@@ -61,63 +62,43 @@
   color: #000;
 }
 
-.menu-container {
-  position: relative;
-  margin-top: 10px; /* Adjust for spacing on mobile */
-}
-
-
-
-.filters, .filter-options {
-  margin-bottom: 10px;
-}
-
+/* Filters and Buttons */
 .filters {
   display: flex;
-  flex-wrap: wrap; /* Allow wrapping on mobile */
-  gap: 10px; /* Add gap between buttons */
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
+.filter-button,
 .import-button,
 .add-button,
 .clear-button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  padding: 10px 15px; /* Adjust padding */
-  font-size: 14px; /* Adjust font size */
-}
-
-.import-button {
-  background-color: #007bff;
-  color: #fff;
-}
-
-.add-button {
-  background-color: #28a745;
-  color: #fff;
-}
-
-.clear-button {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-.filter-button {
+  padding: 10px 15px;
   font-size: 14px;
+}
+
+.import-button { background-color: #007bff; color: #fff; }
+.add-button { background-color: #28a745; color: #fff; }
+.clear-button { background-color: #dc3545; color: #fff; }
+.filter-button {
   background-color: #f0f0f0;
   border: 1px solid #ddd;
-  border-radius: 4px;
   padding: 5px;
 }
 
-.filters button:hover, .filter-options select:hover, .filter-options button:hover {
+.filters button:hover,
+.filter-options select:hover,
+.filter-options button:hover {
   background-color: #e0e0e0;
 }
 
+/* Lists and Items */
 ul {
-  list-style-type: none;
+  list-style: none;
   padding: 0;
 }
 
@@ -141,33 +122,82 @@ li button:hover {
   text-decoration: underline;
 }
 
+/* Question List */
 .question-container {
   margin-top: 20px;
 }
 
+/* Question List */
 .question-header,
 .question-row {
   cursor: pointer;
   background-color: #f5f5f5;
   display: grid;
-  grid-template-columns: 1fr 2fr 50fr 2fr 1fr 1fr; /* Adjusted for responsive columns */
+  grid-template-columns: 1fr 2fr 50fr 2fr 1fr 1fr; /* Responsive columns */
   grid-gap: 5px;
   padding: 10px;
-}
-
-.question-header .column,
-.question-row .column {
-  padding: 5px; /* Add padding for better spacing */
-}
-
-
-.question-header {
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 14px; /* Default font size */
   border-bottom: 1px solid #ccc;
 }
 
+/* Apply outline between columns */
+.question-header .column,
+.question-row .column {
+  padding: 5px; /* Better spacing */
+}
 
+.question-header .column:not(:first-child),
+.question-row .column:not(:first-child) {
+  border-left: 1px solid #ccc; /* Outline between properties */
+}
+
+
+/* Font Styling */
+.question-header div:first-child,
+.question-row div:first-child {
+  font-weight: bold;
+}
+
+.question-header div:nth-child(3),
+.question-row div:nth-child(3) {
+  text-align: left;
+}
+
+/* Rating Cell Styling (6th column) */
+.question-row div:nth-child(6) {
+  padding: 5px;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  display: flex;
+}
+
+/* Rating Background Colors */
+.rating-1 { background-color: green; }
+.rating-2 { background-color: lightgreen; }
+.rating-3 { background-color: yellowgreen; }
+.rating-4 { background-color: orange; }
+.rating-5 { background-color: red; }
+
+/* Highlighting */
+.highlight-p {
+  background-color: rgba(255, 255, 113, 0.1);
+}
+
+.highlight-l {
+  background-color: rgba(255, 113, 243, 0.1);
+}
+
+.highlight-pz {
+  background-color: rgba(255, 113, 113, 0.1);
+}
+
+.highlight-i {
+  background-color: rgba(113, 134, 255, 0.1);
+}
+
+/* Actions */
 .question-row .actions {
   grid-column: span 6;
   display: flex;
@@ -179,7 +209,7 @@ li button:hover {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-left: auto; /* Pushes actions to the right */
+  margin-left: auto;
 }
 
 .action-button {
@@ -188,28 +218,19 @@ li button:hover {
   cursor: pointer;
 }
 
-.edit-button {
-  font-size: 80%;
-  cursor: pointer;
-  color: #4e4e4e; /* Style for edit button */
-}
-
-.edit-button:hover {
-  font-size: 90%;
-  color: #242424;
-}
-
+.edit-button,
 .delete-button {
   font-size: 80%;
-  cursor: pointer;
-  color: #4e4e4e; /* Style for delete button */
+  color: #4e4e4e;
 }
 
+.edit-button:hover,
 .delete-button:hover {
   font-size: 90%;
   color: #242424;
 }
 
+/* Confirm Popup */
 .confirm-popup {
   position: fixed;
   top: 0;
@@ -232,45 +253,43 @@ li button:hover {
 /* Responsive Styles */
 @media (max-width: 768px) {
   .filters {
-    flex-direction: column; /* Stack buttons vertically on smaller screens */
+    flex-direction: column;
   }
-  
+
   .header {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .menu-icon {
-    position: static; /* Adjust position for smaller screens */
+    position: static;
     margin-top: 10px;
   }
-  
-  .question-header, .question-row {
-    grid-template-columns: 1fr 2fr 50fr 2fr 1fr 1fr; /* Adjust columns for smaller screens */
-    font-size: 12px; /* Adjust font size */
+
+  .question-header,
+  .question-row {
+    grid-template-columns: 1fr 2fr 50fr 2fr 1fr 1fr;
+    font-size: 12px;
   }
-  
+
   .question-header .column,
   .question-row .column {
-    padding: 3px; /* Adjust padding for mobile */
+    padding: 3px;
   }
 }
 
 @media (max-width: 480px) {
   .header button {
-    font-size: 20px; /* Adjust for very small screens */
+    font-size: 20px;
   }
 
   .filters button {
-    font-size: 12px; /* Adjust button font size for smaller screens */
+    font-size: 12px;
   }
 
-  .question-header, .question-row {
-    grid-template-columns: 1fr 1fr 4fr 1fr 1fr 1fr; /* Adjust for very small screens */
-  }
-
-  .question-header .column,
-  .question-row .column {
-    font-size: 10px; /* Adjust font size for very small screens */
+  .question-header,
+  .question-row {
+    grid-template-columns: 1fr 1fr 4fr 1fr 1fr 1fr;
+    font-size: 10px;
   }
 }

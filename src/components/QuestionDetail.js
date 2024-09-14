@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './QuestionDetail.css'; // Import the CSS file
@@ -20,25 +21,55 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
   useEffect(() => {
     // Apply sorting and filtering to the questions list
     let updatedQuestions = [...questions];
-
+  
     // Apply filtering
     if (filterBy) {
       updatedQuestions = updatedQuestions.filter((q) => q.kategoria === filterBy);
     }
-
+  
     // Apply sorting
     if (sortBy) {
       updatedQuestions = updatedQuestions.sort((a, b) => {
-        if (a[sortBy] === undefined || b[sortBy] === undefined) return 0; // Handle undefined values
-        if (typeof a[sortBy] === 'string') {
-          return a[sortBy].localeCompare(b[sortBy]);
+        if (sortBy === 'number') {
+          // Parse number properties as integers for numeric sorting
+          return (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0);
         }
-        return a[sortBy] - b[sortBy]; // For numeric values
+  
+        if (sortBy === 'zestaw') {
+          // Custom sorting for Zestaw in the format D_Z1, where D_Z is sorted as text and 1 as number
+          const parseZestaw = (zestaw) => {
+            const match = zestaw.match(/([A-Z_]+)(\d*)/);
+            return match ? { text: match[1], number: parseInt(match[2], 10) || 0 } : { text: '', number: 0 };
+          };
+          
+          const zestawA = parseZestaw(a.zestaw);
+          const zestawB = parseZestaw(b.zestaw);
+          
+          if (zestawA.text !== zestawB.text) {
+            return zestawA.text.localeCompare(zestawB.text);
+          }
+          return zestawA.number - zestawB.number;
+        }
+  
+        if (sortBy === 'rating') {
+          // Sort Rating in descending order. NaN or missing values are moved to the end.
+          const ratingA = parseInt(a.rating, 10);
+          const ratingB = parseInt(b.rating, 10);
+  
+          if (isNaN(ratingA)) return 1;
+          if (isNaN(ratingB)) return -1;
+          return ratingB - ratingA;
+        }
+  
+        if (a[sortBy] === undefined || b[sortBy] === undefined) return 0;
+        return typeof a[sortBy] === 'string'
+          ? a[sortBy].localeCompare(b[sortBy])
+          : a[sortBy] - b[sortBy];
       });
     }
-
+  
     setSortedAndFilteredQuestions(updatedQuestions);
-
+  
     // Find the current question based on the provided ID
     const foundQuestion = updatedQuestions.find((q) => q.id === id);
     setQuestion(foundQuestion);

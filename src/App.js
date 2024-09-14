@@ -25,12 +25,29 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedData) {
+      const { questions, sortBy, filterBy } = JSON.parse(storedData);
+      setQuestions(questions || []);
+      setSortBy(sortBy || '');
+      setFilterBy(filterBy || '');
+    }
+  }, []);
+  
+
   // Save questions data to localStorage whenever the state changes
   useEffect(() => {
     if (questions.length > 0) {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(questions));
+      const dataToSave = {
+        questions,
+        sortBy,
+        filterBy,
+      };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
     }
-  }, [questions]);
+  }, [questions, sortBy, filterBy]);
+  
 
   const addQuestions = (newQuestions) => {
     setQuestions([...questions, ...newQuestions]);
