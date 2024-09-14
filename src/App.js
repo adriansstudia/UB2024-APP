@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+
 import MainTab from './components/MainTab';
 import QuestionsList from './components/QuestionsList';
 import QuestionDetail from './components/QuestionDetail';
@@ -142,7 +143,7 @@ function App() {
   };
   
   return (
-    <Router>
+    <Router basename="/UB2024-APP">
       <div className="App">
         <input
           type="file"
@@ -152,16 +153,16 @@ function App() {
           style={{ display: 'none' }}
         />
         <Routes>
-          <Route path="/" element={<Navigate to="/UB2024-APP/" replace />} />
-          <Route path="/UB2024-APP/" element={<MainTab />} />
+          <Route path="/" element={<Navigate to="/" replace />} />
+          <Route path="/" element={<MainTab />} />
           <Route
-            path="/UB2024-APP/questions"
+            path="/questions"
             element={
               <QuestionsList
                 questions={questions}
                 deleteQuestion={deleteQuestion}
                 addQuestions={addQuestions}
-                clearAllQuestions={clearAllQuestions} // Pass clearAllQuestions function
+                clearAllQuestions={clearAllQuestions}
                 sortBy={sortBy}
                 setSortBy={setSortBy}
                 filterBy={filterBy}
@@ -170,7 +171,7 @@ function App() {
             }
           />
           <Route
-            path="/UB2024-APP/question/:id"
+            path="/question/:id"
             element={
               <QuestionDetail
                 questions={questions}
@@ -181,7 +182,7 @@ function App() {
             }
           />
           <Route
-            path="/UB2024-APP/edit/:id"
+            path="/edit/:id"
             element={<EditQuestion questions={questions} saveQuestion={updateQuestion} />}
           />
         </Routes>
