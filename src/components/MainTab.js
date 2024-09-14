@@ -15,7 +15,7 @@ const MainTab = () => {
     if (password === correctPassword) {
       navigate('/UB2024-APP/questions');
     } else {
-      setErrorMessage('Wrong password. Please try again.');
+      setErrorMessage('Hehe, źle.');
     }
   };
 
