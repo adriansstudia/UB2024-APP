@@ -268,7 +268,7 @@ li button:hover {
 
   .question-header,
   .question-row {
-    grid-template-columns: 1fr 2fr 50fr 2fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 50fr 1fr 1fr 1fr;
     font-size: 12px;
   }
 
