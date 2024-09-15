@@ -180,7 +180,7 @@ li button:hover {
 .rating-4 { background-color: orange; }
 .rating-5 { background-color: red; }
 
-/* Highlighting */
+/* Highlighting 
 .highlight-p {
   background-color: rgba(255, 255, 113, 0.1);
 }
@@ -195,7 +195,7 @@ li button:hover {
 
 .highlight-i {
   background-color: rgba(113, 134, 255, 0.1);
-}
+}*/
 
 /* Actions */
 .question-row .actions {

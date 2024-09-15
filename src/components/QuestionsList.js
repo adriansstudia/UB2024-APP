@@ -439,11 +439,11 @@ const QuestionsList = ({
     }
   }, [questions, signedIn]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (signedIn) {
       loadAutosaveAndReplace();
     }
-  }, [signedIn]);
+  }, [signedIn]);*/
 
   const removeOldestFiles = async () => {
     try {
@@ -619,6 +619,7 @@ const QuestionsList = ({
         <button onClick={handleAuthClick} style={{ display: signedIn ? 'none' : 'block' }}>Sign In</button>
         <button onClick={handleSignoutClick} style={{ display: signedIn ? 'block' : 'none' }}>Sign Out</button>
         <button onClick={saveToCSV}>Save State</button>
+        <button onClick={() => autosave(questions, true)}>Autosave</button>
         <label>
           <input
             type="checkbox"
@@ -627,9 +628,7 @@ const QuestionsList = ({
           />
           Enable Autosave
         </label>
-        <button onClick={() => autosave(questions, true)}>
-          Autosave Now
-        </button>
+        
         <button onClick={loadAutosaveAndReplace}>Load Autosave</button>
         <button>
         Current Autosave File: {currentAutosaveFilename}
