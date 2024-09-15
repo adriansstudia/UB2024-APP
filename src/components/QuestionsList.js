@@ -347,10 +347,15 @@ const QuestionsList = ({
   const autosave = () => {
     // Generate filename with date and time
     const now = new Date();
+    // Get the UTC time, and add the 2-hour offset for UTC+2
+    const timezoneOffsetInHours = 2;
+    now.setHours(now.getHours() + timezoneOffsetInHours);
+
+    // Format date as YYYY-MM-DD___HH-MM-SS
     const dateString = now.toISOString()
-      .replace(/T/, '___')       // Replace 'T' with '___'
-      .replace(/:/g, '-')        // Replace colons with hyphens
-      .replace(/\.\d+Z$/, '');   // Remove milliseconds and 'Z' at the end
+      .replace(/T/, '___') // Replace 'T' with '___' for your format
+      .replace(/:/g, '-')   // Replace colons with dashes for hours, minutes, and seconds
+      .replace(/\.\d+Z$/, ''); // Remove milliseconds and 'Z' from the end
     const filename = `${BASE_FILENAME}${dateString}.csv`;
         
     const csv = Papa.unparse(questions, {
