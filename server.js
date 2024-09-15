@@ -1,56 +1,37 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { uploadFile } = require('./uploadToDrive'); // Adjust the path as needed
+const path = require('path');
+require('dotenv').config();
 const cors = require('cors');
-const bodyParser = require('body-parser');
+app.use(cors());
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+app.use(express.json());
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
+app.post('/upload-csv', async (req, res) => {
+  console.log('Request received:', req.body); // Log request data
+  const { csvContent, fileName } = req.body;
+  if (!csvContent || !fileName) {
+      return res.status(400).send('Missing CSV content or file name');
+  }
 
-// MongoDB connection
-mongoose.connect('mongodb://localhost:27017/ub2024_app', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
+  // Save CSV content to a temporary file
+  const tempFilePath = path.join(__dirname, fileName);
+  fs.writeFileSync(tempFilePath, csvContent);
+
+  try {
+      const uploadResponse = await uploadFile(tempFilePath, fileName);
+      res.status(200).send(uploadResponse);
+  } catch (error) {
+      res.status(500).send('Failed to upload file');
+  } finally {
+      // Clean up temporary file
+      fs.unlinkSync(tempFilePath);
+  }
 });
 
-// Question Schema
-const questionSchema = new mongoose.Schema({
-  id: String,
-  number: Number,
-  kategoria: String,
-  zestaw: String,
-  rating: Number,
-  answer: String,
-});
 
-const Question = mongoose.model('Question', questionSchema);
-
-// API Endpoints
-app.get('/questions', async (req, res) => {
-  const questions = await Question.find();
-  res.json(questions);
-});
-
-app.post('/questions', async (req, res) => {
-  const newQuestion = new Question(req.body);
-  await newQuestion.save();
-  res.status(201).json(newQuestion);
-});
-
-app.put('/questions/:id', async (req, res) => {
-  const updatedQuestion = await Question.findOneAndUpdate({ id: req.params.id }, req.body, { new: true });
-  res.json(updatedQuestion);
-});
-
-app.delete('/questions/:id', async (req, res) => {
-  await Question.findOneAndDelete({ id: req.params.id });
-  res.status(204).send();
-});
-
-// Start server
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
