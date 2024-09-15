@@ -1,3 +1,6 @@
+// src/components/QuestionsList.js
+import { LOCAL_STORAGE_KEY } from '../constants';
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Papa from 'papaparse';
@@ -13,11 +16,17 @@ const YOUR_CLIENT_SECRET = process.env.REACT_APP_YOUR_CLIENT_SECRET;
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
 const SCOPES = 'https://www.googleapis.com/auth/drive';
 
+
+
+const BASE_FILENAME = 'UB2024-APP_autosave_'; // Base filename for autosaves
+
+
 const QuestionsList = ({
   questions,
   setQuestions,
   deleteQuestion,
   addQuestions,
+  addNextQuestions,
   clearAllQuestions,
   sortBy,
   setSortBy,
@@ -32,8 +41,9 @@ const QuestionsList = ({
   const [gapiInited, setGapiInited] = useState(false);
   const [gisInited, setGisInited] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
-  const [autosaveFileId, setAutosaveFileId] = useState(null); // State to store the autosave file ID
+  const [currentAutosaveFilename, setCurrentAutosaveFilename] = useState('');
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const kategoriaSet = new Set(questions.map(q => q.kategoria));
@@ -99,7 +109,6 @@ const QuestionsList = ({
   const handleDelete = (id, e) => {
     e.stopPropagation();
     deleteQuestion(id);
-    autosave();
   };
   const handleEdit = (id, e) => {
     e.stopPropagation();
@@ -133,7 +142,7 @@ const QuestionsList = ({
           rating: row['rating'] || '',
           answer: row['answer'] || '',
         }));
-        addQuestions(importedQuestions);
+        addNextQuestions(importedQuestions);
       },
       error: (error) => console.error('Error parsing CSV:', error),
     });
@@ -170,13 +179,7 @@ const QuestionsList = ({
   const handleLoadState = (e) => console.log('Load State clicked');
 
   const handleClearAll = () => {
-    setQuestionsToDelete(filteredQuestions.length);
-    setShowConfirmPopup(true);
-  };
-
-  const confirmClearAll = (confirm) => {
-    if (confirm) clearAllQuestions();
-    setShowConfirmPopup(false);
+    clearAllQuestions()
   };
 
 
@@ -339,30 +342,18 @@ const QuestionsList = ({
     }
   };
 
-  const uploadCSVToDrive = (blob, fileName, folderId) => {
-    const metadata = {
-      name: fileName,
-      mimeType: 'text/csv',
-      parents: [folderId],
-    };
-    const formData = new FormData();
-    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    formData.append('file', blob);
 
-    fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-      method: 'POST',
-      headers: new Headers({ 'Authorization': `Bearer ${window.gapi.client.getToken().access_token}` }),
-      body: formData,
-    })
-      .then(response => response.json())
-      .then(value => {
-        if (fileName === 'UB2024-APP_autosave.csv') setAutosaveFileId(value.id);
-      })
-      .catch(error => console.error('Error uploading file:', error));
-  };
-
+  // Autosave function
   const autosave = () => {
-    const filename = 'UB2024-APP_autosave.csv';
+    // Generate filename with date and time
+    const now = new Date();
+    const dateString = now.toISOString()
+      .replace(/T/, '___')       // Replace 'T' with '___'
+      .replace(/:/g, '-')        // Replace colons with hyphens
+      .replace(/\.\d+Z$/, '');   // Remove milliseconds and 'Z' at the end
+    const filename = `${BASE_FILENAME}${dateString}.csv`;
+    
+    
 
     const csv = Papa.unparse(questions, {
       header: true,
@@ -372,50 +363,126 @@ const QuestionsList = ({
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 
-    if (signedIn) replaceFileInDrive(blob, filename);
-  };
-
-  const replaceFileInDrive = async (blob, fileName) => {
-    try {
-      const folderId = await getFolderId('UB2024-APP');
-      const fileId = await getFileIdByName(folderId, fileName);
-
-      if (fileId) await window.gapi.client.drive.files.delete({ fileId });
-
-      uploadCSVToDrive(blob, fileName, folderId);
-    } catch (error) {
-      console.error('Error replacing file in Drive:', error);
+    // Upload the autosave file to Google Drive
+    if (signedIn) {
+      uploadCSVToDrive(blob, filename);
+      setCurrentAutosaveFilename(filename); // Update the filename display
     }
   };
+
+  // Function to upload CSV to Google Drive
+  const uploadCSVToDrive = async (blob, fileName) => {
+    try {
+      const folderId = await getFolderId('UB2024-APP');
+
+      const fileMetadata = {
+        name: fileName,
+        mimeType: 'text/csv',
+        parents: [folderId]
+      };
+
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
+      form.append('file', blob);
+
+      const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: new Headers({ 'Authorization': `Bearer ${window.gapi.client.getToken().access_token}` }),
+        body: form
+      });
+
+      if (!response.ok) throw new Error('Failed to upload autosave file');
+    } catch (error) {
+      console.error('Error uploading autosave to Drive:', error);
+    }
+  };
+
+  // Set up interval for autosaving every 10 seconds
+  useEffect(() => {
+    if (signedIn) {
+      const intervalId = setInterval(() => {
+        autosave();
+      }, 100000); // 10000 milliseconds = 10 seconds
+
+      // Cleanup on component unmount
+      return () => clearInterval(intervalId);
+    }
+  }, [questions, signedIn]);
 
   const loadAutosaveAndReplace = async () => {
     try {
       clearAllQuestions();
-
+  
+      // Get folder ID
       const folderId = await getFolderId('UB2024-APP');
-      const fileId = await getFileIdByName(folderId, 'UB2024-APP_autosave.csv');
-
-      if (!fileId) {
-        console.error('Autosave file not found');
+  
+      // List files in the folder with filenames starting with 'UB2024-APP_autosave_'
+      const response = await window.gapi.client.drive.files.list({
+        q: `'${folderId}' in parents and name contains 'UB2024-APP_autosave_'`,
+        fields: 'files(id, name)',
+      });
+  
+      const files = response.result.files;
+  
+      if (files.length === 0) {
+        console.error('No autosave files found');
         return;
       }
-
+  
+      // Debugging: Log the files retrieved from Drive
+      console.log('Files retrieved from Drive:', files);
+  
+      // Sort files based on the timestamp in the filename (extract timestamp from the filename)
+      const sortedFiles = files.sort((a, b) => {
+        const matchA = a.name.match(/UB2024-APP_autosave_(\d{4}-\d{2}-\d{2}___\d{2}-\d{2}-\d{2})/);
+        const matchB = b.name.match(/UB2024-APP_autosave_(\d{4}-\d{2}-\d{2}___\d{2}-\d{2}-\d{2})/);
+  
+        // Check if matches are valid
+        if (!matchA || !matchB) {
+          console.error('Filename does not match expected pattern:', a.name, b.name);
+          return 0; // Don't sort if names don't match the pattern
+        }
+  
+        const timeA = matchA[1];
+        const timeB = matchB[1];
+  
+        // Compare timestamps, latest one should come first
+        return timeB.localeCompare(timeA);
+      });
+  
+      // Debugging: Log the sorted files
+      console.log('Sorted files:', sortedFiles);
+  
+      // Get the latest file (first in the sorted list)
+      const latestFile = sortedFiles[0];
+  
+      if (!latestFile) {
+        console.error('No matching autosave files found after sorting');
+        return;
+      }
+  
+      // Debugging: Log the file to be loaded
+      console.log('Latest file to be loaded:', latestFile);
+  
+      // Fetch the latest file content
       const accessToken = window.gapi.client.getToken().access_token;
-      const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
-
-      const response = await fetch(url, {
+      const url = `https://www.googleapis.com/drive/v3/files/${latestFile.id}?alt=media`;
+  
+      const fileResponse = await fetch(url, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
-
-      if (!response.ok) throw new Error('Failed to fetch autosave file');
-
-      const csvText = await response.text();
+  
+      if (!fileResponse.ok) throw new Error('Failed to fetch autosave file');
+  
+      const csvText = await fileResponse.text();
       handleImportFromText(csvText); // Import the data into your app
+  
     } catch (error) {
       console.error('Error loading autosave:', error);
     }
   };
+  
 
 
   return (
@@ -463,6 +530,9 @@ const QuestionsList = ({
         <button onClick={saveToCSV}>Save State</button>
         <button onClick={autosave}>Autosave</button>
         <button onClick={loadAutosaveAndReplace}>Load Autosave</button>
+        <button>
+        Current Autosave File: {currentAutosaveFilename}
+        </button>
 
         <div className="sort-buttons">
           {['number', 'kategoria', 'zestaw', 'rating'].map(property => (
@@ -524,9 +594,7 @@ const QuestionsList = ({
       </div>
       {showConfirmPopup && (
         <div className="confirm-popup">
-          <p>Do you want to remove all the questions?</p>
-          <button onClick={() => confirmClearAll(true)}>Yes</button>
-          <button onClick={() => confirmClearAll(false)}>No</button>
+
         </div>
       )}
     </div>

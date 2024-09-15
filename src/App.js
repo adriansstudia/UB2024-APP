@@ -1,3 +1,7 @@
+// src/App.js
+import { LOCAL_STORAGE_KEY } from './constants';
+
+
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
@@ -10,8 +14,6 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import Papa from 'papaparse';
 
 
-// Key for saving to localStorage
-const LOCAL_STORAGE_KEY = 'UB2024_QuestionsData';
 
 function App() {
   const [questions, setQuestions] = useState([]);
@@ -51,6 +53,10 @@ function App() {
   
 
   const addQuestions = (newQuestions) => {
+    setQuestions(newQuestions);
+  };
+
+  const addNextQuestions = (newQuestions) => {
     setQuestions([...questions, ...newQuestions]);
   };
 
@@ -162,6 +168,7 @@ function App() {
                 questions={questions}
                 deleteQuestion={deleteQuestion}
                 addQuestions={addQuestions}
+                addNextQuestions={addNextQuestions}
                 clearAllQuestions={clearAllQuestions} // Pass clearAllQuestions function
                 sortBy={sortBy}
                 setSortBy={setSortBy}
