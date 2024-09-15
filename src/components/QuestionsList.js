@@ -352,9 +352,7 @@ const QuestionsList = ({
       .replace(/:/g, '-')        // Replace colons with hyphens
       .replace(/\.\d+Z$/, '');   // Remove milliseconds and 'Z' at the end
     const filename = `${BASE_FILENAME}${dateString}.csv`;
-    
-    
-
+        
     const csv = Papa.unparse(questions, {
       header: true,
       delimiter: ";",
@@ -395,6 +393,7 @@ const QuestionsList = ({
     } catch (error) {
       console.error('Error uploading autosave to Drive:', error);
     }
+    removeOldestFiles();
   };
 
   // Set up interval for autosaving every 10 seconds
@@ -402,12 +401,67 @@ const QuestionsList = ({
     if (signedIn) {
       const intervalId = setInterval(() => {
         autosave();
-      }, 100000); // 10000 milliseconds = 10 seconds
+      }, 10000); // 10000 milliseconds = 10 seconds
 
       // Cleanup on component unmount
       return () => clearInterval(intervalId);
     }
   }, [questions, signedIn]);
+
+  const removeOldestFiles = async () => {
+    try {
+      // Get folder ID
+      const folderId = await getFolderId('UB2024-APP');
+  
+      // List all files in the folder with filenames starting with 'UB2024-APP_autosave_'
+      const response = await window.gapi.client.drive.files.list({
+        q: `'${folderId}' in parents and name contains 'UB2024-APP_autosave_'`,
+        fields: 'files(id, name)',
+      });
+  
+      const files = response.result.files;
+  
+      if (files.length <= 5) {
+        console.log('No need to delete files, less than or equal to 5 autosaves present');
+        return;
+      }
+  
+      // Sort files based on the timestamp in the filename
+      const sortedFiles = files.sort((a, b) => {
+        const matchA = a.name.match(/UB2024-APP_autosave_(\d{4}-\d{2}-\d{2}___\d{2}-\d{2}-\d{2})/);
+        const matchB = b.name.match(/UB2024-APP_autosave_(\d{4}-\d{2}-\d{2}___\d{2}-\d{2}-\d{2})/);
+  
+        if (!matchA || !matchB) {
+          console.error('Filename does not match expected pattern:', a.name, b.name);
+          return 0;
+        }
+  
+        const timeA = matchA[1];
+        const timeB = matchB[1];
+  
+        return timeB.localeCompare(timeA); // Latest first
+      });
+  
+      // Debugging: Log sorted files to check the order
+      console.log('Sorted files (newest first):', sortedFiles);
+  
+      // Remove oldest files if more than 5 exist
+      const filesToDelete = sortedFiles.slice(5); // Get files older than the 5 newest
+  
+      // Debugging: Log files to be deleted
+      console.log('Files to delete:', filesToDelete);
+  
+      for (const file of filesToDelete) {
+        await window.gapi.client.drive.files.delete({
+          fileId: file.id,
+        });
+        console.log(`Deleted file: ${file.name}`);
+      }
+  
+    } catch (error) {
+      console.error('Error removing oldest autosave files:', error);
+    }
+  };
 
   const loadAutosaveAndReplace = async () => {
     try {
