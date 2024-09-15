@@ -42,6 +42,9 @@ const QuestionsList = ({
   const [gisInited, setGisInited] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [currentAutosaveFilename, setCurrentAutosaveFilename] = useState('');
+  const [autosaveEnabled, setAutosaveEnabled] = useState(false); // State for checkbox
+  const [autosaveInterval, setAutosaveInterval] = useState(null); // State for autosave interval
+
   const navigate = useNavigate();
 
 
@@ -330,19 +333,6 @@ const QuestionsList = ({
     }
   };
 
-  const getFileIdByName = async (folderId, fileName) => {
-    try {
-      const response = await window.gapi.client.drive.files.list({
-        'q': `'${folderId}' in parents and name = '${fileName}'`,
-      });
-      const files = response.result.files;
-      return files.length > 0 ? files[0].id : null;
-    } catch (error) {
-      console.error('Error getting file ID by name:', error);
-    }
-  };
-
-
   // Autosave function
   const autosave = () => {
     // Generate filename with date and time
@@ -371,6 +361,42 @@ const QuestionsList = ({
       uploadCSVToDrive(blob, filename);
       setCurrentAutosaveFilename(filename); // Update the filename display
     }
+  };
+
+  // Function to start autosaving
+  const startAutosave = () => {
+    if (autosaveInterval) return; // Prevent multiple intervals
+    const interval = setInterval(() => {
+      if (autosaveEnabled) {
+        autosave(questions, true); // Adjust as needed
+      }
+    }, 10000); // 10 seconds
+    setAutosaveInterval(interval);
+  };
+
+  // Function to stop autosaving
+  const stopAutosave = () => {
+    if (autosaveInterval) {
+      clearInterval(autosaveInterval);
+      setAutosaveInterval(null);
+    }
+  };
+
+
+  // Use effect to start or stop autosave based on checkbox
+  useEffect(() => {
+    if (autosaveEnabled) {
+      startAutosave();
+    } else {
+      stopAutosave();
+    }
+    // Cleanup on component unmount
+    return () => stopAutosave();
+  }, [autosaveEnabled]);
+
+  // Event handler for checkbox change
+  const handleCheckboxChange = (event) => {
+    setAutosaveEnabled(event.target.checked);
   };
 
   // Function to upload CSV to Google Drive
@@ -405,13 +431,19 @@ const QuestionsList = ({
   useEffect(() => {
     if (signedIn) {
       const intervalId = setInterval(() => {
-        autosave();
+       
       }, 10000); // 10000 milliseconds = 10 seconds
 
       // Cleanup on component unmount
       return () => clearInterval(intervalId);
     }
   }, [questions, signedIn]);
+
+  useEffect(() => {
+    if (signedIn) {
+      loadAutosaveAndReplace();
+    }
+  }, [signedIn]);
 
   const removeOldestFiles = async () => {
     try {
@@ -587,7 +619,17 @@ const QuestionsList = ({
         <button onClick={handleAuthClick} style={{ display: signedIn ? 'none' : 'block' }}>Sign In</button>
         <button onClick={handleSignoutClick} style={{ display: signedIn ? 'block' : 'none' }}>Sign Out</button>
         <button onClick={saveToCSV}>Save State</button>
-        <button onClick={autosave}>Autosave</button>
+        <label>
+          <input
+            type="checkbox"
+            checked={autosaveEnabled}
+            onChange={handleCheckboxChange}
+          />
+          Enable Autosave
+        </label>
+        <button onClick={() => autosave(questions, true)}>
+          Autosave Now
+        </button>
         <button onClick={loadAutosaveAndReplace}>Load Autosave</button>
         <button>
         Current Autosave File: {currentAutosaveFilename}
