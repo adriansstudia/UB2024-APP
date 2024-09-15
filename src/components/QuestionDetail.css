@@ -45,7 +45,7 @@
 .question-detail {
   position: relative;
   overflow: hidden; /* Ensures the question content stays within the container */
-  width: 100%;
+
   height: 100%;
 }
 
