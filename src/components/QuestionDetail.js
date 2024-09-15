@@ -16,6 +16,8 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
   const [sortedAndFilteredQuestions, setSortedAndFilteredQuestions] = useState([]);
 
   const [touchStartX, setTouchStartX] = useState(null);
+  const [currentSlide, setCurrentSlide] = useState(0); // To track the current question index
+
 
   useEffect(() => {
     let updatedQuestions = [...questions];
@@ -96,7 +98,10 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
     const currentIndex = sortedAndFilteredQuestions.findIndex(q => q.id === question.id);
     const previousQuestion = sortedAndFilteredQuestions[currentIndex - 1];
     if (previousQuestion) {
-      navigate(`/UB2024-APP/question/${previousQuestion.id}`);
+      setCurrentSlide(currentSlide - 1); // Move the slide to the previous one
+      setTimeout(() => {
+        navigate(`/UB2024-APP/question/${previousQuestion.id}`);
+      }, 300); // Delay to allow the animation to complete
     }
   };
 
@@ -104,10 +109,12 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
     const currentIndex = sortedAndFilteredQuestions.findIndex(q => q.id === question.id);
     const nextQuestion = sortedAndFilteredQuestions[currentIndex + 1];
     if (nextQuestion) {
-      navigate(`/UB2024-APP/question/${nextQuestion.id}`);
+      setCurrentSlide(currentSlide + 1); // Move the slide to the next one
+      setTimeout(() => {
+        navigate(`/UB2024-APP/question/${nextQuestion.id}`);
+      }, 300); // Delay to allow the animation to complete
     }
   };
-
 
   const handleTouchStart = (e) => {
     setTouchStartX(e.touches[0].clientX);
@@ -147,7 +154,8 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
   };
 
   return (
-    <div className={`question-detail ${getBackgroundClass(question.kategoria)}`}
+    <div 
+      className={`question-detail ${getBackgroundClass(question.kategoria)}`}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -155,6 +163,13 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
         <FontAwesomeIcon icon={faArrowLeft} />
       </button>
       <i className="fas fa-star rate-icon" onClick={handleRate}></i>
+      {/* Slide container with dynamic translation based on currentSlide */}
+      <div
+        className="question-slide"
+        style={{
+          transform: `translateX(${currentSlide * -100}%)`
+        }}
+      ></div>
 
       <div className="question-header2">
         <p><strong>Number:</strong> {question.number}</p>
