@@ -9,6 +9,7 @@ import './QuestionsList.css'; // Import your custom styles
 
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
 const API_KEY = process.env.REACT_APP_API_KEY;
+const YOUR_CLIENT_SECRET = process.env.REACT_APP_YOUR_CLIENT_SECRET;
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
 const SCOPES = 'https://www.googleapis.com/auth/drive';
 
@@ -33,20 +34,6 @@ const QuestionsList = ({
   const [signedIn, setSignedIn] = useState(false);
   const [autosaveFileId, setAutosaveFileId] = useState(null); // State to store the autosave file ID
   const navigate = useNavigate();
-
-
-  useEffect(() => {
-    const loadGoogleAPI = () => {
-      const script = document.createElement('script');
-      script.src = 'https://apis.google.com/js/api.js';
-      script.onload = () => {
-        window.gapi.load('client:auth2', initializeGapiClient);
-        window.gapi.load('auth2', initializeGisClient);
-      };
-      document.body.appendChild(script);
-    };
-    loadGoogleAPI();
-  }, []);
 
   useEffect(() => {
     const kategoriaSet = new Set(questions.map(q => q.kategoria));
@@ -107,7 +94,6 @@ const QuestionsList = ({
     applyFilterAndSort();
   }, [questions, filterBy, sortBy]);
   
-
   const handleSort = (property) => setSortBy(property);
   const handleFilter = (value) => setFilterBy(value);
   const handleDelete = (id, e) => {
@@ -119,6 +105,19 @@ const QuestionsList = ({
     e.stopPropagation();
     navigate(`/UB2024-APP/edit/${id}`);
   };
+
+  const handleQuestionClick = (id) => navigate(`/UB2024-APP/question/${id}`);
+
+  function getRatingClass(rating) {
+    switch (parseInt(rating, 10)) { // Ensure rating is an integer
+      case 1: return 'rating-1';
+      case 2: return 'rating-2';
+      case 3: return 'rating-3';
+      case 4: return 'rating-4';
+      case 5: return 'rating-5';
+      default: return '';
+    }
+  }
 
   const handleImport = (file) => {
     Papa.parse(file, {
@@ -181,14 +180,32 @@ const QuestionsList = ({
   };
 
 
+  useEffect(() => {
+    const loadGoogleAPI = () => {
+      const script = document.createElement('script');
+      script.src = 'https://apis.google.com/js/api.js';
+      script.onload = () => {
+        window.gapi.load('client:auth2', initializeGapiClient);
+        window.gapi.load('auth2', initializeGisClient);
+      };
+      document.body.appendChild(script);
+    };
+    loadGoogleAPI();
+  }, []);
+
   const initializeGapiClient = () => {
     window.gapi.client.init({
       apiKey: API_KEY,
       discoveryDocs: DISCOVERY_DOCS,
     }).then(() => {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        window.gapi.client.setToken({ access_token: token });
+        setSignedIn(true);
+      }
       setGapiInited(true);
       maybeEnableButtons();
-    });
+    }).catch(error => console.error('Error initializing GAPI client:', error));
   };
 
   const initializeGisClient = () => {
@@ -196,9 +213,8 @@ const QuestionsList = ({
       client_id: CLIENT_ID,
       scope: SCOPES,
       callback: (resp) => {
-        if (resp.error) {
-          throw resp;
-        }
+        if (resp.error) throw resp;
+        localStorage.setItem('authToken', resp.access_token);
         setSignedIn(true);
         checkFolder();
       },
@@ -214,56 +230,71 @@ const QuestionsList = ({
   };
 
   const handleAuthClick = () => {
-    if (window.gapi.client.getToken() === null) {
-      window.tokenClient.requestAccessToken({ prompt: 'consent' });
-    } else {
-      window.tokenClient.requestAccessToken({ prompt: '' });
-    }
+    window.tokenClient.requestAccessToken({ prompt: window.gapi.client.getToken() === null ? 'consent' : '' });
   };
 
   const handleSignoutClick = () => {
     const token = window.gapi.client.getToken();
-    if (token !== null) {
+    if (token) {
       window.google.accounts.oauth2.revoke(token.access_token);
+      localStorage.removeItem('authToken');
       window.gapi.client.setToken('');
       setSignedIn(false);
     }
   };
 
-  const checkFolder = () => {
-    window.gapi.client.drive.files.list({
-      'q': 'name = "UB2024-APP"',
-    }).then((response) => {
+  const checkAuth = () => {
+    if (window.gapi && window.gapi.client) {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        window.gapi.client.setToken({ access_token: token });
+        setSignedIn(true);
+      }
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+  
+  const checkFolder = async () => {
+    try {
+      const response = await window.gapi.client.drive.files.list({ q: 'name = "UB2024-APP"' });
       const files = response.result.files;
       if (files.length > 0) {
         localStorage.setItem('parent_folder', files[0].id);
       } else {
-        createFolder();
+        await createFolder();
       }
-    });
+    } catch (error) {
+      console.error('Error checking folder:', error);
+    }
   };
 
-  const createFolder = () => {
-    const accessToken = window.gapi.client.getToken().access_token;
-    window.gapi.client.request({
-      path: 'drive/v2/files',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
-      },
-      body: {
-        title: 'UB2024-APP',
-        mimeType: 'application/vnd.google-apps.folder',
-      },
-    }).then((response) => {
+  const createFolder = async () => {
+    try {
+      const accessToken = window.gapi.client.getToken().access_token;
+      const response = await window.gapi.client.request({
+        path: 'drive/v2/files',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: {
+          title: 'UB2024-APP',
+          mimeType: 'application/vnd.google-apps.folder',
+        },
+      });
       localStorage.setItem('parent_folder', response.result.id);
-    });
+    } catch (error) {
+      console.error('Error creating folder:', error);
+    }
   };
 
   const saveToCSV = () => {
     const now = new Date();
-    const filename = `UB2024_${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}.csv`;
+    const filename = `UB2024_${now.toISOString().slice(0, 10)}_${now.toTimeString().slice(0, 5).replace(":", "-")}.csv`;
 
     const csv = Papa.unparse(questions, {
       header: true,
@@ -272,18 +303,7 @@ const QuestionsList = ({
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-
-    /*const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);*/
-
-    if (signedIn) {
-      uploadCSVToDrive(blob, filename);
-    }
+    if (signedIn) uploadCSVToDrive(blob, filename);
   };
 
   const getFolderId = async (folderName) => {
@@ -292,39 +312,32 @@ const QuestionsList = ({
         'q': `name = '${folderName}' and mimeType = 'application/vnd.google-apps.folder'`,
       });
       const folders = response.result.files;
-      if (folders.length > 0) {
-        return folders[0].id; // Return the ID of the existing folder
-      } else {
-        // Create the folder if it does not exist
-        const createResponse = await window.gapi.client.drive.files.create({
-          resource: {
-            name: folderName,
-            mimeType: 'application/vnd.google-apps.folder',
-          },
-          fields: 'id',
-        });
-        return createResponse.result.id;
-      }
+      if (folders.length > 0) return folders[0].id;
+
+      const createResponse = await window.gapi.client.drive.files.create({
+        resource: {
+          name: folderName,
+          mimeType: 'application/vnd.google-apps.folder',
+        },
+        fields: 'id',
+      });
+      return createResponse.result.id;
     } catch (error) {
       console.error('Error getting or creating folder:', error);
     }
   };
-  
+
   const getFileIdByName = async (folderId, fileName) => {
     try {
       const response = await window.gapi.client.drive.files.list({
         'q': `'${folderId}' in parents and name = '${fileName}'`,
       });
       const files = response.result.files;
-      if (files.length > 0) {
-        return files[0].id; // Return the ID of the file
-      }
-      return null; // File not found
+      return files.length > 0 ? files[0].id : null;
     } catch (error) {
       console.error('Error getting file ID by name:', error);
     }
   };
-  
 
   const uploadCSVToDrive = (blob, fileName, folderId) => {
     const metadata = {
@@ -335,7 +348,7 @@ const QuestionsList = ({
     const formData = new FormData();
     formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
     formData.append('file', blob);
-  
+
     fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
       method: 'POST',
       headers: new Headers({ 'Authorization': `Bearer ${window.gapi.client.getToken().access_token}` }),
@@ -343,13 +356,10 @@ const QuestionsList = ({
     })
       .then(response => response.json())
       .then(value => {
-        if (fileName === 'UB2024-APP_autosave.csv') {
-          setAutosaveFileId(value.id); // Save the autosave file ID
-        }
+        if (fileName === 'UB2024-APP_autosave.csv') setAutosaveFileId(value.id);
       })
       .catch(error => console.error('Error uploading file:', error));
   };
-  
 
   const autosave = () => {
     const filename = 'UB2024-APP_autosave.csv';
@@ -362,80 +372,51 @@ const QuestionsList = ({
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 
-    if (signedIn) {
-      replaceFileInDrive(blob, filename);
-    }
+    if (signedIn) replaceFileInDrive(blob, filename);
   };
 
   const replaceFileInDrive = async (blob, fileName) => {
     try {
-      const folderId = await getFolderId('UB2024-APP'); // Replace with your folder name
+      const folderId = await getFolderId('UB2024-APP');
       const fileId = await getFileIdByName(folderId, fileName);
-  
-      if (fileId) {
-        // Delete the existing file
-        await window.gapi.client.drive.files.delete({ fileId });
-      }
-  
-      // Upload the new file
+
+      if (fileId) await window.gapi.client.drive.files.delete({ fileId });
+
       uploadCSVToDrive(blob, fileName, folderId);
     } catch (error) {
       console.error('Error replacing file in Drive:', error);
     }
   };
-  
 
   const loadAutosaveAndReplace = async () => {
     try {
-      // Step 1: Delete all existing questions
       clearAllQuestions();
-  
-      // Step 2: Get the folder ID and find the autosave file ID
-      const folderId = await getFolderId('UB2024-APP'); // Replace with your folder name
+
+      const folderId = await getFolderId('UB2024-APP');
       const fileId = await getFileIdByName(folderId, 'UB2024-APP_autosave.csv');
-  
+
       if (!fileId) {
         console.error('Autosave file not found');
         return;
       }
-  
-      // Step 3: Load the autosave file
+
       const accessToken = window.gapi.client.getToken().access_token;
       const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
-  
+
       const response = await fetch(url, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
+        headers: { 'Authorization': `Bearer ${accessToken}` },
       });
-  
-      if (!response.ok) {
-        throw new Error('Failed to fetch autosave file');
-      }
-  
+
+      if (!response.ok) throw new Error('Failed to fetch autosave file');
+
       const csvText = await response.text();
       handleImportFromText(csvText); // Import the data into your app
-  
     } catch (error) {
-      console.error('Error loading autosave file:', error);
+      console.error('Error loading autosave:', error);
     }
   };
 
-    
-
-  const handleQuestionClick = (id) => navigate(`/UB2024-APP/question/${id}`);
-
-  function getRatingClass(rating) {
-    switch (parseInt(rating, 10)) { // Ensure rating is an integer
-      case 1: return 'rating-1';
-      case 2: return 'rating-2';
-      case 3: return 'rating-3';
-      case 4: return 'rating-4';
-      case 5: return 'rating-5';
-      default: return '';
-    }
-  }
 
   return (
     <div className="questions-list">
