@@ -40,10 +40,7 @@ def extract_images_and_text(cell, image_files):
     for ref, url in image_files.items():
         if ref in html_content:
             html_content = html_content.replace(ref, url)
-    if '<img' in html_content:
-        return html_content
-    else:
-        return cell.get_text()
+    return html_content
 
 def adjust_table_cells(html_file, image_files):
     with open(html_file, 'r', encoding='utf-8') as file:
@@ -69,7 +66,7 @@ def adjust_table_cells(html_file, image_files):
     
     return table_adjusted
 
-def remove_html_tags(text):
+def strip_html_tags(text):
     """Remove HTML tags from text."""
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
@@ -96,10 +93,11 @@ def create_docx_from_adjusted_table(table_html, output_docx):
     for i, row_html in enumerate(table_html):
         for j, cell_content in enumerate(row_html):
             cell = tbl.cell(i + 1, j)  # Shift rows by 1 to account for heading row
-            if cell_content.startswith('<'):
-                # Insert HTML content (i.e., images)
-                cell.paragraphs[0].add_run(cell_content)
+            # Strip HTML tags for specific columns
+            if headings[j] in ["number", "question", "kategoria", "zestaw", "rating"]:
+                cell.text = strip_html_tags(cell_content)
             else:
+                # For the "answer" column (or any other column), just copy content
                 cell.text = cell_content
     
     doc.save(output_docx)
@@ -154,35 +152,13 @@ def process_docx(input_docx, temp_output_docx, final_output_docx, csv_file):
     table_adjusted = adjust_table_cells(html_file, image_files)
     create_docx_from_adjusted_table(table_adjusted, temp_output_docx)
     
-    # Remove HTML tags from cells that do not contain images
+    # Directly save the DOCX as final output
     final_doc = Document(temp_output_docx)
-    new_doc = Document()
-    
-    for table in final_doc.tables:
-        # Create a new table with the same number of rows and columns
-        num_cols = len(table.rows[0].cells) if table.rows else 0
-        new_table = new_doc.add_table(rows=0, cols=num_cols)
-
-        for row in table.rows:
-            new_row = new_table.add_row()
-            for i, cell in enumerate(row.cells):
-                if i >= len(new_row.cells):
-                    # Ensure the new row has enough cells
-                    new_row.add_cell()
-                # Check if cell contains HTML (likely with images)
-                if '<img' in cell.text:
-                    # Copy the cell content as is if it contains images
-                    new_row.cells[i].text = cell.text
-                else:
-                    # Remove HTML tags if no images are present
-                    clean_text = remove_html_tags(cell.text)
-                    new_row.cells[i].text = clean_text
-
-    new_doc.save(temp_output_docx)
+    final_doc.save(final_output_docx)
     
     # Rearrange columns in the final output
     new_order = ["number", "question", "kategoria", "zestaw", "rating", "answer"]
-    rearrange_table_columns(temp_output_docx, final_output_docx, new_order)
+    rearrange_table_columns(final_output_docx, final_output_docx, new_order)
     
     # Save the rearranged table as CSV
     save_table_as_csv(final_output_docx, csv_file)
