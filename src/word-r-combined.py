@@ -14,7 +14,7 @@ def extract_images(input_docx, image_dir='images', base_url='https://raw.githubu
     for rel in doc.part.rels.values():
         if "image" in rel.target_ref:
             image_data = rel.target_part.blob
-            image_ext = rel.target_part.content_type.split('/')[1]
+            image_ext = 'png'
             image_name = f'image{len(image_files) + 1}.{image_ext}'
             image_path = os.path.join(image_dir, image_name)
             
