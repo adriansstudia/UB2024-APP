@@ -11,9 +11,9 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative; /* For positioning internal elements */
+  justify-content: center;
+  align-items: center;
   
-
-  height: calc(100vh - 80px); /* Full height minus margins */
   
   overflow-y: auto; /* Allow scrolling for overflowing content */
   box-sizing: border-box; /* Include padding and border in width/height calculations */
@@ -37,18 +37,22 @@
 }
 
 .question-detail h2 {
-  font-size: 24px;
+  font-size: 20px;
+  text-align: justify;
+
   color: #333;
   margin-bottom: 10px; /* Adjusted margin */
 }
 
 .question-detail {
-  position: absolute;
+  position: fixed;
 
-  width: 95%;
+
+  width: 100%;
 
   height: 95%;
 }
+
 
 .question-slide {
   -webkit-transform: translateX(100%);
@@ -62,7 +66,7 @@
 
 
 .question-content {
-  min-width: 100%;
+  
   flex-shrink: 0; /* Ensures each content takes full width */
 }
 
@@ -91,14 +95,18 @@
 }
 
 .reveal-button {
-  background-color: rgba(0, 0, 0, 0.5); /* 50% transparent black */
-  color: white;
-  border: none;
-  padding: 10px 20px;
+  position: fixed;
+  bottom: 42px; /* Positioned at the bottom */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.5); /* 50% transparent white */
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  color: rgba(0, 0, 0, 0.7);
+  padding: 5px 15px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  margin-bottom: 10px;
+  z-index: 10;
 }
 
 .reveal-button.hidden {
@@ -108,13 +116,13 @@
 /* Hide Answer button */
 .hide-button {
   position: fixed;
-  bottom: 20px; /* Positioned at the bottom */
+  bottom: 42px; /* Positioned at the bottom */
   left: 50%;
   transform: translateX(-50%);
   background-color: rgba(255, 255, 255, 0.5); /* 50% transparent white */
-  border: 2px solid rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.5);
   color: rgba(0, 0, 0, 0.7);
-  padding: 10px 20px;
+  padding: 5px 15px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
@@ -176,7 +184,7 @@
   position: fixed; /* Fixed position so it stays on top */
   top: 20px; /* Adjust position from top */
   right: 20px; /* Adjust position from right */
-  z-index: 1000; /* High z-index to ensure it's always on top */
+  z-index: 500; /* High z-index to ensure it's always on top */
 }
 
 .rate-icon:hover {
@@ -258,3 +266,5 @@
 .prev-arrow:hover, .next-arrow:hover {
   color: rgba(0, 0, 0, 1); /* Full opacity on hover */
 }
+
+

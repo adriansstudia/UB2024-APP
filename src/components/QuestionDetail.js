@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './QuestionDetail.css'; // Import the CSS file
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit } from '@fortawesome/free-solid-svg-icons';
+
 
 const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
   const { id } = useParams();
@@ -11,13 +12,12 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
   const [showRatingPopup, setShowRatingPopup] = useState(false);
   const [rating, setRating] = useState(1);
-
+  const [isEditVisible, setIsEditVisible] = useState(false); // New state for edit form visibility
   const [question, setQuestion] = useState(null);
   const [sortedAndFilteredQuestions, setSortedAndFilteredQuestions] = useState([]);
 
   const [touchStartX, setTouchStartX] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0); // To track the current question index
-
 
   useEffect(() => {
     let updatedQuestions = [...questions];
@@ -153,6 +153,15 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
     }
   };
 
+
+  const handleEditClick = () => {
+    // Toggle edit form visibility
+    setIsEditVisible(!isEditVisible);
+    // Navigate to edit route
+    navigate(`/UB2024-APP/edit/${question.id}`);
+  };
+
+
   return (
     <div 
       className={`question-detail ${getBackgroundClass(question.kategoria)}`}
@@ -162,6 +171,11 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
       <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
         <FontAwesomeIcon icon={faArrowLeft} />
       </button>
+      <FontAwesomeIcon
+        icon={faEdit}
+        className="edit-icon"
+        onClick={handleEditClick}
+      />
       <i className="fas fa-star rate-icon" onClick={handleRate}></i>
       {/* Slide container with dynamic translation based on currentSlide */}
       <div
