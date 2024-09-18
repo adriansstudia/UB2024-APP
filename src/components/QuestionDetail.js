@@ -85,7 +85,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
     const currentIndex = sortedAndFilteredQuestions.findIndex(q => q.id === question.id);
     const nextQuestion = sortedAndFilteredQuestions[currentIndex + offset];
     if (nextQuestion) {
-      setAnimationClass(offset > 0 ? 'slide-out' : 'slide-in');
+      setAnimationClass(offset > 0 ? 'slide-left' : 'slide-right');
       setTimeout(() => {
         navigate(`/UB2024-APP/question/${nextQuestion.id}`);
         setAnimationClass('');
@@ -146,6 +146,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
 
 
     <div {...swipeHandlers} className={`question-detail ${getBackgroundClass(question.kategoria)} ${animationClass}`}>
+      
       
 
       <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
