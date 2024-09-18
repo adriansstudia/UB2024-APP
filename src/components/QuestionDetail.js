@@ -69,7 +69,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
     const foundQuestion = updatedQuestions.find(q => q.id === id);
     setQuestion(foundQuestion);
     setIsAnswerRevealed(false);
-    setRating(foundQuestion ? parseInt(foundQuestion.rating, 10) || 1 : 1);
+    setRating(foundQuestion && !isNaN(parseInt(foundQuestion.rating, 10)) ? parseInt(foundQuestion.rating, 10) : '');
   }, [id, questions, sortBy, filterBy]);
 
 
@@ -143,93 +143,95 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
 
 
   return (
-
-
-    <div {...swipeHandlers} className={`question-detail ${getBackgroundClass(question.kategoria)} ${animationClass}`}>
-      
-      
-
-      <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
-        <FontAwesomeIcon icon={faArrowLeft} />
-      </button>
-      <FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={handleEditClick} />
-      <strong className="question-index">
-        {sortedAndFilteredQuestions.findIndex(q => q.id === question.id) + 1} / {sortedAndFilteredQuestions.length}
-      </strong>
-      <i className="fas fa-star rate-icon" onClick={handleRate}></i>
-
-      <div className="question-header2">
-        <p><strong>Number:</strong> {question.number}</p>
-        <p><strong>Kategoria:</strong> {question.kategoria}</p>
-        <p><strong>Zestaw:</strong> {question.zestaw}</p>
-        <p>
-          <strong>Rating:</strong>
-          <span className="rating-value" style={{ backgroundColor: getRatingBackgroundColor(rating) }}>
-            {rating}
-          </span>
-        </p>
-      </div>
-
-      <h2>{question.question}</h2>
-
-      <div className="question-content">
-        <button onClick={handleRevealAnswer} className={`reveal-button ${isAnswerRevealed ? 'hidden' : ''}`}>
-          Reveal Answer
+    <div className="question-detail-background">
+        <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
+          <FontAwesomeIcon icon={faArrowLeft} />
         </button>
+        <FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={handleEditClick} />
+        <strong className="question-index">
+          {sortedAndFilteredQuestions.findIndex(q => q.id === question.id) + 1} / {sortedAndFilteredQuestions.length}
+        </strong>
+        <i className="fas fa-star rate-icon" onClick={handleRate}></i>
 
-        <div className={`answer-container ${isAnswerRevealed ? 'revealed' : ''}`}>
-          <div dangerouslySetInnerHTML={{ __html: question.answer }} />
-        </div>
-
-        {isAnswerRevealed && (
-          <button className="hide-button" onClick={handleHideAnswer}>
-            Hide Answer
-          </button>
-        )}
-
-        <div className={`ai-answer-container ${isAIAnswerVisible ? 'revealed' : ''}`}>
-          <ReactQuill 
-            className="ai-answer-editor"
-            theme="snow"
-            value={aiAnswerContent}
-            onChange={handleAiAnswerChange}
-          />
-        </div>
+        <FontAwesomeIcon icon={faAnglesLeft} className="prev-arrow" onClick={handlePrevious} />
+        <FontAwesomeIcon icon={faAnglesRight} className="next-arrow" onClick={handleNext} />
 
         {!isAIAnswerVisible && (
-          <button className="ai-answer-button" onClick={handleRevealAIAnswer}>
-            AI
+            <button className="ai-answer-button" onClick={handleRevealAIAnswer}>
+              AI
+            </button>
+          )}
+          {isAIAnswerVisible && (
+            <button className="hide-button-ai" onClick={handleHideAIAnswer}>
+              Hide AI
+            </button>
+          )}
+          {isAnswerRevealed && (
+            <button className="hide-button" onClick={handleHideAnswer}>
+              Hide Answer
+            </button>
+          )}
+          <button onClick={handleRevealAnswer} className={`reveal-button ${isAnswerRevealed ? 'hidden' : ''}`}>
+            Reveal Answer
           </button>
-        )}
 
-        {isAIAnswerVisible && (
-          <button className="hide-button-ai" onClick={handleHideAIAnswer}>
-            Hide AI
-          </button>
-        )}
-      </div>
 
-      {showRatingPopup && (
-        <div className="rating-popup">
-          <button className="close-popup" onClick={handleCloseRatingPopup}>
-            <FontAwesomeIcon icon={faTimes} />
-          </button>
-          <p>How hard was it?</p>
-          <div>
-            {[1, 2, 3, 4, 5].map(num => (
-              <button key={num} className={`rating-${num}`} onClick={() => handleRating(num)}>
-                {num}
-              </button>
-            ))}
-          </div>
+      <div {...swipeHandlers} className={`question-detail ${getBackgroundClass(question.kategoria)} ${animationClass}`}>
+        
+        <div className="question-header2">
+          <p><strong>Number:</strong> {question.number}</p>
+          <p><strong>Kategoria:</strong> {question.kategoria}</p>
+          <p><strong>Zestaw:</strong> {question.zestaw}</p>
+          <p>
+            <strong>Rating:</strong>
+            <span className="rating-value" style={{ backgroundColor: getRatingBackgroundColor(rating) }}>
+              {rating}
+            </span>
+          </p>
         </div>
-      )}
 
-      <FontAwesomeIcon icon={faAnglesLeft} className="prev-arrow" onClick={handlePrevious} />
-      <FontAwesomeIcon icon={faAnglesRight} className="next-arrow" onClick={handleNext} />
+        <h2>{question.question}</h2>
+
+        <div className="question-content">
+
+
+          <div className={`answer-container ${isAnswerRevealed ? 'revealed' : ''}`}>
+            <div dangerouslySetInnerHTML={{ __html: question.answer }} />
+          </div>
+
+
+          <div className={`ai-answer-container ${isAIAnswerVisible ? 'revealed' : ''}`}>
+            <ReactQuill 
+              className="ai-answer-editor"
+              theme="snow"
+              value={aiAnswerContent}
+              onChange={handleAiAnswerChange}
+            />
+          </div>
+
+
+        </div>
+
+        {showRatingPopup && (
+          <div className="rating-popup">
+            <button className="close-popup" onClick={handleCloseRatingPopup}>
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+            <p>How hard was it?</p>
+            <div>
+              {[1, 2, 3, 4, 5].map(num => (
+                <button key={num} className={`rating-${num}`} onClick={() => handleRating(num)}>
+                  {num}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+
+      </div>
     </div>
   );
 };
 
 export default QuestionDetail;
-
