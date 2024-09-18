@@ -214,7 +214,7 @@
 }
 
 /* Icons */
-.rate-icon, .edit-icon, .back-button {
+.fullscreen-button, .rate-icon, .edit-icon, .back-button {
   position: fixed;
   font-size: 22px;
   
@@ -222,12 +222,12 @@
   cursor: pointer;
   z-index: 500;
 }
-
+.fullscreen-button { top: 20px; left: 70px; background: transparent; border: none;  }
 .rate-icon { top: 20px; right: 20px; }
 .edit-icon { top: 20px; right: 70px; }
 .back-button { top: 20px; left: 20px; background: transparent; border: none; }
 
-.rate-icon:hover, .edit-icon:hover, .back-button:hover {
+.fullscreen-button:hover, .rate-icon:hover, .edit-icon:hover, .back-button:hover {
   font-size: 24px;
   color: #242424;
 }

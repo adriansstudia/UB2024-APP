@@ -1,7 +1,7 @@
 /* Base Styles */
 .questions-list {
   font-family: Roboto, sans-serif;
-  background-color: #f5f5f5;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)); /* Gradient background */
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
