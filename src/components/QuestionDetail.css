@@ -1,182 +1,123 @@
 /* components/QuestionDetail.css */
-/* Example with Open Sans from Google Fonts */
+/* Import Open Sans font */
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
 
-
+/* Common Styles */
 .question-detail {
-  font-family: 'Open Sans';
+  font-family: 'Open Sans', sans-serif;
   background-color: #f5f5f5;
   padding: 20px;
-  margin: 10px; /* Uniform margin */
+  margin: 10px; /* Uniform margin on all sides */
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative; /* For positioning internal elements */
 
   overflow-y: auto; /* Allow scrolling for overflowing content */
   box-sizing: border-box; /* Include padding and border in width/height calculations */
+  width: calc(100% - 20px); /* Adjust width to account for the margin */
+  height: calc(100vh - 20px); /* Adjust height to account for the margin */
 }
 
 .question-index {
-  
   text-align: center; /* Center the question number */
-  
   font-size: 22px; /* Adjust the font size */
   font-weight: bold; /* Make it bold if needed */
-  left: 43%;
-  color: rgba(0, 0, 0, 0.9); /* 50% transparent */
- 
+  color: rgba(0, 0, 0, 0.9); /* 90% opaque */
   position: fixed; /* Fixed position so it stays on top */
   top: 20px; /* Adjust position from top */
+  left: 50%;
+  transform: translateX(-50%); /* Center horizontally */
   z-index: 500; /* High z-index to ensure it's always on top */
 }
 
 /* Highlighting */
-.highlight-p {
-  background-color: rgba(255, 255, 113, 0.1);
-}
-
-.highlight-l {
-  background-color: rgba(255, 113, 243, 0.1);
-}
-
-.highlight-pz {
-  background-color: rgba(255, 113, 113, 0.1);
-}
-
-.highlight-i {
-  background-color: rgba(113, 134, 255, 0.1);
-}
+.highlight-p { background-color: rgba(255, 255, 113, 0.1); }
+.highlight-l { background-color: rgba(255, 113, 243, 0.1); }
+.highlight-pz { background-color: rgba(255, 113, 113, 0.1); }
+.highlight-i { background-color: rgba(113, 134, 255, 0.1); }
 
 .question-detail h2 {
   font-size: 20px;
-  text-align: justify;
-  text-align-last: center;
-
   color: #333;
-  margin-bottom: 10px; /* Adjusted margin */
+  margin-bottom: 10px;
+  text-align: center;
 }
-
-.question-detail {
-  position: fixed;
-
-
-  width: 95%;
-
-  height: 95%;
-}
-
 
 .question-slide {
-  -webkit-transform: translateX(100%);
   transform: translateX(100%);
-  -webkit-transition: -webkit-transform 0.5s ease;
   transition: transform 0.5s ease;
-  transition: -webkit-transform 0.3s ease-in-out;
-  will-change: transform;
   display: flex;
 }
 
-
 .question-content {
-  
-  flex-shrink: 0; /* Ensures each content takes full width */
+  flex-shrink: 0;
+  margin-bottom: 30px;
 }
-
 
 .question-header2 {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
-
   font-size: 14px;
   color: #555;
-  border-bottom: 1px solid #ccc; 
+  border-bottom: 1px solid #ccc;
+  margin-top: 20px;
 }
-
-
 
 .question-header p {
   margin: 0;
-}
-
-
-
-.question-content {
-  margin-bottom: 30px;
-  position: relative; /* To position the Hide Answer button */
-}
-
-.reveal-button {
-  position: fixed;
-  bottom: 42px; /* Positioned at the bottom */
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(255, 255, 255, 0.5); /* 50% transparent white */
-  border: 1px solid rgba(0, 0, 0, 0.5);
-  color: rgba(0, 0, 0, 0.7);
-  padding: 5px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  z-index: 10;
-}
-
-.reveal-button.hidden {
-  display: none; /* Hide the button when the answer is revealed */
-}
-
-/* Hide Answer button */
-.hide-button {
-  position: fixed;
-  bottom: 42px; /* Positioned at the bottom */
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(255, 255, 255, 0.5); /* 50% transparent white */
-  border: 1px solid rgba(0, 0, 0, 0.5);
-  color: rgba(0, 0, 0, 0.7);
-  padding: 5px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  z-index: 10;
-}
-
-.hide-button:hover {
-  background-color: #888;
-  color: white;
 }
 
 .answer-container {
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.5s ease-out;
-  padding: 0px; /* Adding some padding for better readability */
-
-  border-radius: 4px; /* Rounded corners */
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Slight shadow for better visibility */
+  padding: 0;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   text-align: justify;
   font-size: 14px;
 }
 
 .answer-container.revealed {
-  max-height: 5000px; /* Adjust as needed */
+  max-height: 5000px;
   transition: max-height 0.5s ease-in;
 }
 
 .answer-container img {
   display: block;
-  margin: 0 auto; /* Center images horizontally */
+  margin: 0 auto;
 }
 
-/* Ensure the container takes full width and positions items below */
+/* Buttons */
+.reveal-button, .hide-button, .ai-answer-button, .hide-button-ai {
+  position: fixed;
+  bottom: 42px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  color: rgba(0, 0, 0, 0.7);
+  padding: 5px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 10;
+}
+
+.reveal-button.hidden, .hide-button.hidden, .hide-button-ai.hidden { display: none; }
+.hide-button:hover, .ai-answer-button:hover, .hide-button-ai:hover {
+  background-color: #888;
+  color: white;
+}
+
 .buttons-container {
   display: flex;
-  justify-content: space-between; /* Distribute buttons evenly */
-  margin-top: 20px; /* Add spacing from the content */
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
 .buttons-container button {
-  background-color: rgba(0, 0, 0, 0.5); /* 50% transparent black */
+  background-color: rgba(0, 0, 0, 0.5);
   color: white;
   border: none;
   padding: 10px 20px;
@@ -190,21 +131,44 @@
   color: #242424;
 }
 
-.rate-icon {
-  font-size: 20px; /* Adjust size as needed */
-  color: rgba(0, 0, 0, 0.7); /* 50% transparent */
+/* Icons */
+.rate-icon, .edit-icon, .back-button {
+  position: fixed;
+  font-size: 22px;
+  color: rgba(0, 0, 0, 0.7);
   cursor: pointer;
-  position: fixed; /* Fixed position so it stays on top */
-  top: 20px; /* Adjust position from top */
-  right: 20px; /* Adjust position from right */
-  z-index: 500; /* High z-index to ensure it's always on top */
+  z-index: 500;
 }
 
-.rate-icon:hover {
-  font-size: 22px;
+.rate-icon { top: 20px; right: 20px; }
+.edit-icon { top: 20px; right: 70px; }
+.back-button { top: 20px; left: 20px; background: transparent; border: none; }
+
+.rate-icon:hover, .edit-icon:hover, .back-button:hover {
+  font-size: 24px;
   color: #242424;
 }
 
+/* Arrows */
+.prev-arrow, .next-arrow {
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  position: fixed;
+  bottom: 50px;
+  z-index: 100;
+}
+
+.prev-arrow { left: 20px; }
+.next-arrow { right: 20px; }
+
+.prev-arrow:hover, .next-arrow:hover {
+  color: rgba(0, 0, 0, 1);
+}
+
+/* Rating */
 .rating-1 { background-color: green; }
 .rating-2 { background-color: lightgreen; }
 .rating-3 { background-color: yellowgreen; }
@@ -213,22 +177,20 @@
 
 .rating-popup {
   position: relative;
-  /* Existing styles */
 }
 
 .rating-value {
   display: inline-block;
   font-weight: bold;
-  color: white; /* Adjust text color for better readability */
-  background-color: transparent; /* This will be set dynamically in the JS */
+  color: white;
+  background-color: transparent;
   border-radius: 3px;
-  padding: 5px 10px; /* Increased padding for more space */
-  margin-left: 5px; /* Space between rating and other elements */
-  font-size: 1.2rem; /* Adjust font size if needed */
-  vertical-align: top; /* Aligns the text to the top of the line height */
-  line-height: 1; /* Ensures the text is aligned to the top without extra space */
+  padding: 5px 10px;
+  margin-left: 5px;
+  font-size: 1.2rem;
+  vertical-align: top;
+  line-height: 1;
 }
-
 
 .close-popup {
   position: absolute;
@@ -240,69 +202,7 @@
   cursor: pointer;
 }
 
-.close-popup:hover {
-  color: red; /* Change color on hover if desired */
-}
-
-
-.back-button {
-  position: fixed; /* Fixed position so it stays on top */
-  top: 20px;
-  left: 20px;
-  background: transparent !important; /* No background */
-  border: none !important; /* No border */
-  font-size: 24px; /* Adjust size */
-  color: rgba(0, 0, 0, 0.7); /* 50% transparent */
-  cursor: pointer;
-  z-index: 500; /* High z-index to ensure it's always on top */
-}
-
-.back-button:hover{
-  font-size: 26px;
-  color: #242424;
-}
-
-/* Bold arrows for Previous and Next buttons */
-.prev-arrow, .next-arrow {
-  font-size: 24px; /* Adjust size */
-  color: rgba(0, 0, 0, 0.7); /* Slightly transparent */
-  cursor: pointer;
-  background: transparent; /* No background */
-  border: none; /* No border */
-  position: fixed;
-  bottom: 50px; /* Always visible at the bottom */
-  z-index: 100; /* Make sure they are above other elements */
-}
-
-.prev-arrow {
-  left: 20px; /* Positioned on the left */
-}
-
-.next-arrow {
-  right: 20px; /* Positioned on the right */
-}
-
-.prev-arrow:hover, .next-arrow:hover {
-  color: rgba(0, 0, 0, 1); /* Full opacity on hover */
-}
-
-
-.edit-icon{
-  font-size: 18px; /* Adjust size as needed */
-  color: rgba(0, 0, 0, 0.7); /* 50% transparent */
-  cursor: pointer;
-  right: 70px;
-  
-  position: fixed; /* Fixed position so it stays on top */
-  top: 22px; /* Adjust position from top */
-  z-index: 500; /* High z-index to ensure it's always on top */
-}
-
-.edit-icon:hover{
-  font-size: 20px;
-  color: #242424;
-}
-
+.close-popup:hover { color: red; }
 
 /* AI Answer Button */
 .ai-answer-button {
@@ -379,4 +279,35 @@
 .hide-button:hover-ai {
   background-color: #888;
   color: white;
+}
+
+
+.slide-in {
+  animation: slide-in 0.5s forwards;
+}
+
+.slide-out {
+  animation: slide-out 0.5s forwards;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
 }

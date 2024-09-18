@@ -1,10 +1,13 @@
-import React, { useState, useEffect} from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './QuestionDetail.css'; // Import the CSS file
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit } from '@fortawesome/free-solid-svg-icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import the Quill CSS
+import { useSwipeable } from 'react-swipeable';
+
 
 
 const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
@@ -14,35 +17,31 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
   const [showRatingPopup, setShowRatingPopup] = useState(false);
   const [rating, setRating] = useState(1);
-  const [isEditVisible, setIsEditVisible] = useState(false); // New state for edit form visibility
+  const [isEditVisible, setIsEditVisible] = useState(false);
   const [question, setQuestion] = useState(null);
   const [sortedAndFilteredQuestions, setSortedAndFilteredQuestions] = useState([]);
-
-
-  const [touchStartX, setTouchStartX] = useState(null);
-  const [touchEndX, setTouchEndX] = useState(null); // Track touch end position
-  const [currentSlide, setCurrentSlide] = useState(0); // To track the current question index
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth); // Track screen width
-  // State to control whether the AI answer content is shown
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [isAIAnswerVisible, setIsAIAnswerVisible] = useState(false);
-  // State to store the AI answer content
   const [aiAnswerContent, setAiAnswerContent] = useState('<p>AI answer content</p>');
+  const [animationClass, setAnimationClass] = useState('');
 
+
+  // Update sorted and filtered questions
   useEffect(() => {
     let updatedQuestions = [...questions];
 
     if (filterBy) {
-      updatedQuestions = updatedQuestions.filter((q) => q.kategoria === filterBy);
+      updatedQuestions = updatedQuestions.filter(q => q.kategoria === filterBy);
     }
 
     if (sortBy) {
-      updatedQuestions = updatedQuestions.sort((a, b) => {
+      updatedQuestions.sort((a, b) => {
         if (sortBy === 'number') {
           return (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0);
         }
 
         if (sortBy === 'zestaw') {
-          const parseZestaw = (zestaw) => {
+          const parseZestaw = zestaw => {
             const match = zestaw.match(/([A-Z_]+)(\d*)/);
             return match ? { text: match[1], number: parseInt(match[2], 10) || 0 } : { text: '', number: 0 };
           };
@@ -50,194 +49,121 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
           const zestawA = parseZestaw(a.zestaw);
           const zestawB = parseZestaw(b.zestaw);
 
-          if (zestawA.text !== zestawB.text) {
-            return zestawA.text.localeCompare(zestawB.text);
-          }
-          return zestawA.number - zestawB.number;
+          return zestawA.text !== zestawB.text
+            ? zestawA.text.localeCompare(zestawB.text)
+            : zestawA.number - zestawB.number;
         }
 
         if (sortBy === 'rating') {
-          const ratingA = parseInt(a.rating, 10);
-          const ratingB = parseInt(b.rating, 10);
-
-          if (isNaN(ratingA)) return 1;
-          if (isNaN(ratingB)) return -1;
+          const ratingA = parseInt(a.rating, 10) || 0;
+          const ratingB = parseInt(b.rating, 10) || 0;
           return ratingB - ratingA;
         }
 
-        if (a[sortBy] === undefined || b[sortBy] === undefined) return 0;
-        return typeof a[sortBy] === 'string'
-          ? a[sortBy].localeCompare(b[sortBy])
-          : a[sortBy] - b[sortBy];
+        return (a[sortBy] || '').localeCompare(b[sortBy] || '');
       });
     }
 
     setSortedAndFilteredQuestions(updatedQuestions);
 
-    const foundQuestion = updatedQuestions.find((q) => q.id === id);
+    const foundQuestion = updatedQuestions.find(q => q.id === id);
     setQuestion(foundQuestion);
     setIsAnswerRevealed(false);
-    // Initialize rating with the question's rating
-    setRating(foundQuestion && !isNaN(parseInt(foundQuestion.rating, 10)) ? parseInt(foundQuestion.rating, 10) : '');
-
-
+    setRating(foundQuestion ? parseInt(foundQuestion.rating, 10) || 1 : 1);
   }, [id, questions, sortBy, filterBy]);
 
 
-  useEffect(() => {
-    const handleResize = () => {
-      setScreenWidth(window.innerWidth);
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // Adjust swipe sensitivity
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => handleSwipe(1),
+    onSwipedRight: () => handleSwipe(-1),
+    swipeDuration: 500,  // Increase this value to allow longer swipe durations
+    delta: 50,  // Increase this value to require a larger swipe distance
+  });
+
+  const handleSwipe = (offset) => {
+    const currentIndex = sortedAndFilteredQuestions.findIndex(q => q.id === question.id);
+    const nextQuestion = sortedAndFilteredQuestions[currentIndex + offset];
+    if (nextQuestion) {
+      setAnimationClass(offset > 0 ? 'slide-out' : 'slide-in');
+      setTimeout(() => {
+        navigate(`/UB2024-APP/question/${nextQuestion.id}`);
+        setAnimationClass('');
+      }, 500);  // Match this duration with the animation time
+    }
+  };
 
   if (!question) return <p>Question not found.</p>;
 
-  const handleRevealAnswer = () => {
-    setIsAnswerRevealed(true);
-  };
+  const handleRevealAnswer = () => setIsAnswerRevealed(true);
+  const handleHideAnswer = () => setIsAnswerRevealed(false);
 
-  const handleHideAnswer = () => {
-    setIsAnswerRevealed(false);
-  };
-
-  const handleRate = () => {
-    setShowRatingPopup(true);
-  };
-
+  const handleRate = () => setShowRatingPopup(true);
   const handleRating = (value) => {
     setRating(value);
     updateRating(question.id, value);
     setShowRatingPopup(false);
   };
 
-  const handleCloseRatingPopup = () => {
-    setShowRatingPopup(false);
-  };
+  const handleCloseRatingPopup = () => setShowRatingPopup(false);
 
-  const handlePrevious = () => {
+  const navigateQuestion = (offset) => {
     const currentIndex = sortedAndFilteredQuestions.findIndex(q => q.id === question.id);
-    const previousQuestion = sortedAndFilteredQuestions[currentIndex - 1];
-    if (previousQuestion) {
-      setCurrentSlide(currentSlide - 1); // Move the slide to the previous one
-      setTimeout(() => {
-        navigate(`/UB2024-APP/question/${previousQuestion.id}`);
-      }, 300); // Delay to allow the animation to complete
-    }
-  };
-
-  const handleNext = () => {
-    const currentIndex = sortedAndFilteredQuestions.findIndex(q => q.id === question.id);
-    const nextQuestion = sortedAndFilteredQuestions[currentIndex + 1];
+    const nextQuestion = sortedAndFilteredQuestions[currentIndex + offset];
     if (nextQuestion) {
-      setCurrentSlide(currentSlide + 1); // Move the slide to the next one
-      setTimeout(() => {
-        navigate(`/UB2024-APP/question/${nextQuestion.id}`);
-      }, 300); // Delay to allow the animation to complete
+      setCurrentSlide(currentSlide + offset);
+      setTimeout(() => navigate(`/UB2024-APP/question/${nextQuestion.id}`), 300);
     }
   };
 
-  const handleTouchStart = (e) => {
-    setTouchStartX(e.touches[0].clientX);
-  };
+  const handlePrevious = () => navigateQuestion(-1);
+  const handleNext = () => navigateQuestion(1);
 
-  const handleTouchEnd = (e) => {
-    setTouchEndX(e.changedTouches[0].clientX);
-    const swipeDistance = touchStartX - touchEndX;
-    const swipePercentage = (Math.abs(swipeDistance) / screenWidth) * 100;
+  const getBackgroundClass = (kategoria) => ({
+    'P': 'highlight-p',
+    'L': 'highlight-l',
+    'PŻ': 'highlight-pz',
+    'I': 'highlight-i'
+  }[kategoria] || '');
 
-    if (swipePercentage > 30) { // Swipe more than ..% of screen width
-      if (swipeDistance > 0) { // Swipe left
-        handleNext();
-      } else { // Swipe right
-        handlePrevious();
-      }
-    }
-  };
-
-  const getBackgroundClass = (kategoria) => {
-    const backgroundClasses = {
-      'P': 'highlight-p',
-      'L': 'highlight-l',
-      'PŻ': 'highlight-pz',
-      'I': 'highlight-i'
-    };
-    return backgroundClasses[kategoria] || '';
-  };
-
-  // Function to get background color based on rating
   const getRatingBackgroundColor = (rating) => {
-    switch (rating) {
-      case 1: return 'green';
-      case 2: return 'lightgreen';
-      case 3: return 'yellowgreen';
-      case 4: return 'orange';
-      case 5: return 'red';
-      default: return 'transparent';
-    }
+    const colors = ['green', 'lightgreen', 'yellowgreen', 'orange', 'red'];
+    return colors[rating - 1] || 'transparent';
   };
-
 
   const handleEditClick = () => {
-    // Toggle edit form visibility
-    setIsEditVisible(!isEditVisible);
-    // Navigate to edit route
+    setIsEditVisible(prev => !prev);
     navigate(`/UB2024-APP/edit/${question.id}`);
   };
 
-  // Handle AI answer content change
-  const handleAiAnswerChange = (content) => {
-    setAiAnswerContent(content);
-  };
+  const handleAiAnswerChange = (content) => setAiAnswerContent(content);
+  const handleRevealAIAnswer = () => setIsAIAnswerVisible(true);
+  const handleHideAIAnswer = () => setIsAIAnswerVisible(false);
 
-  // Toggle AI answer visibility
-  const handleRevealAIAnswer = () => {
-    setIsAIAnswerVisible(true);
-  };
 
-  const handleHideAIAnswer = () => {
-    setIsAIAnswerVisible(false);
-  };
 
   return (
-    <div 
-      className={`question-detail ${getBackgroundClass(question.kategoria)}`}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}><FontAwesomeIcon icon={faArrowLeft} />
 
-      </button><FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={handleEditClick} />
+
+    <div {...swipeHandlers} className={`question-detail ${getBackgroundClass(question.kategoria)} ${animationClass}`}>
+      
+
+      <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
+        <FontAwesomeIcon icon={faArrowLeft} />
+      </button>
+      <FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={handleEditClick} />
       <strong className="question-index">
         {sortedAndFilteredQuestions.findIndex(q => q.id === question.id) + 1} / {sortedAndFilteredQuestions.length}
       </strong>
-
       <i className="fas fa-star rate-icon" onClick={handleRate}></i>
-      {/* Slide container with dynamic translation based on currentSlide */}
-      <div
-        className="question-slide"
-        style={{
-          transform: `translateX(${currentSlide * -100}%)`
-        }}
-      ></div>
 
       <div className="question-header2">
         <p><strong>Number:</strong> {question.number}</p>
         <p><strong>Kategoria:</strong> {question.kategoria}</p>
         <p><strong>Zestaw:</strong> {question.zestaw}</p>
         <p>
-          <strong>Rating:</strong> 
-          <span 
-            className="rating-value" 
-            style={{ 
-              backgroundColor: getRatingBackgroundColor(rating),
-              borderRadius: '3px',
-              padding: '2px 5px',
-              color: '#fff' // Optional: ensure text color contrasts well with background
-            }}
-          >
+          <strong>Rating:</strong>
+          <span className="rating-value" style={{ backgroundColor: getRatingBackgroundColor(rating) }}>
             {rating}
           </span>
         </p>
@@ -246,10 +172,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
       <h2>{question.question}</h2>
 
       <div className="question-content">
-        <button
-          onClick={handleRevealAnswer}
-          className={`reveal-button ${isAnswerRevealed ? 'hidden' : ''}`}
-        >
+        <button onClick={handleRevealAnswer} className={`reveal-button ${isAnswerRevealed ? 'hidden' : ''}`}>
           Reveal Answer
         </button>
 
@@ -263,9 +186,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
           </button>
         )}
 
-        {/* Sliding AI answer container */}
         <div className={`ai-answer-container ${isAIAnswerVisible ? 'revealed' : ''}`}>
-          {/* Rich text editor for AI answer */}
           <ReactQuill 
             className="ai-answer-editor"
             theme="snow"
@@ -274,21 +195,17 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
           />
         </div>
 
-        {/* AI Answer button (reveals the answer) */}
         {!isAIAnswerVisible && (
           <button className="ai-answer-button" onClick={handleRevealAIAnswer}>
             AI
           </button>
         )}
 
-        {/* Hide button (only shows if the answer is revealed) */}
         {isAIAnswerVisible && (
           <button className="hide-button-ai" onClick={handleHideAIAnswer}>
             Hide AI
           </button>
         )}
-
-        
       </div>
 
       {showRatingPopup && (
@@ -298,12 +215,8 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
           </button>
           <p>How hard was it?</p>
           <div>
-            {[1, 2, 3, 4, 5].map((num) => (
-              <button
-                key={num}
-                className={`rating-${num}`}
-                onClick={() => handleRating(num)}
-              >
+            {[1, 2, 3, 4, 5].map(num => (
+              <button key={num} className={`rating-${num}`} onClick={() => handleRating(num)}>
                 {num}
               </button>
             ))}
@@ -311,18 +224,11 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
         </div>
       )}
 
-      <FontAwesomeIcon
-        icon={faAnglesLeft}
-        className="prev-arrow"
-        onClick={handlePrevious}
-      />
-      <FontAwesomeIcon
-        icon={faAnglesRight}
-        className="next-arrow"
-        onClick={handleNext}
-      />
+      <FontAwesomeIcon icon={faAnglesLeft} className="prev-arrow" onClick={handlePrevious} />
+      <FontAwesomeIcon icon={faAnglesRight} className="next-arrow" onClick={handleNext} />
     </div>
   );
 };
 
 export default QuestionDetail;
+
