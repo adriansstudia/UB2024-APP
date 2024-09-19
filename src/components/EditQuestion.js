@@ -15,6 +15,8 @@ const EditQuestion = ({ questions, saveQuestion }) => {
     zestaw: '',
     rating: 1,
     answer: '',
+    aiAnswer: '', // New field for AI Answer
+    law: '' // New field for Law
   });
   const [isHtmlMode, setIsHtmlMode] = useState(true); // Toggle for HTML or Rich Text
 
@@ -52,6 +54,18 @@ const EditQuestion = ({ questions, saveQuestion }) => {
         <button className="close-button" onClick={handleClose}>X</button>
         <h2>Edit Question</h2>
         
+        <div className="edit-question-row">
+          <label>
+            Number:
+            <input 
+              name="number" 
+              value={editedQuestion.number} 
+              onChange={handleChange} 
+              type="text" 
+            />
+          </label>
+        </div>
+
         <div className="edit-question-row">
           <label>
             Question:
@@ -141,6 +155,30 @@ const EditQuestion = ({ questions, saveQuestion }) => {
               />
             )}
           </div>
+        </div>
+
+        <div className="edit-question-row">
+          <label>
+            AI Answer:
+            <input 
+              name="aiAnswer" 
+              value={editedQuestion.aiAnswer} 
+              onChange={handleChange} 
+              type="text" 
+            />
+          </label>
+        </div>
+
+        <div className="edit-question-row">
+          <label>
+            Law:
+            <input 
+              name="law" 
+              value={editedQuestion.law} 
+              onChange={handleChange} 
+              type="text" 
+            />
+          </label>
         </div>
 
         <button className="save-button" onClick={handleSubmit}>Save</button>

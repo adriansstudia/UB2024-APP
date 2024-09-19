@@ -1,6 +1,5 @@
-// src/components/QuestionsList.js
-import { LOCAL_STORAGE_KEY } from '../constants';
 
+// src/components/QuestionsList.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Papa from 'papaparse';
@@ -9,21 +8,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faEllipsisV, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import './QuestionsList.css'; // Import your custom styles
 
-
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
 const API_KEY = process.env.REACT_APP_API_KEY;
 const YOUR_CLIENT_SECRET = process.env.REACT_APP_YOUR_CLIENT_SECRET;
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
 const SCOPES = 'https://www.googleapis.com/auth/drive';
 
-
-
 const BASE_FILENAME = 'UB2024-APP_autosave_'; // Base filename for autosaves
-
 
 const QuestionsList = ({
   questions,
-  setQuestions,
   deleteQuestion,
   addQuestions,
   addNextQuestions,
@@ -37,7 +31,6 @@ const QuestionsList = ({
   const [kategoriaOptions, setKategoriaOptions] = useState([]);
   const [showMenu, setShowMenu] = useState(false);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
-  const [questionsToDelete, setQuestionsToDelete] = useState(0);
   const [gapiInited, setGapiInited] = useState(false);
   const [gisInited, setGisInited] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
@@ -56,25 +49,21 @@ const QuestionsList = ({
   useEffect(() => {
     const applyFilterAndSort = () => {
       let updatedQuestions = [...questions];
-  
       if (filterBy) {
         updatedQuestions = updatedQuestions.filter(q => q.kategoria === filterBy);
       }
-  
       if (sortBy) {
         updatedQuestions.sort((a, b) => {
           if (sortBy === 'number') {
             // Parse number properties as integers for numeric sorting
             return (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0);
           }
-  
           if (sortBy === 'zestaw') {
             // Custom sorting for Zestaw in the format D_Z1, where D_Z is sorted as text and 1 as number
             const parseZestaw = (zestaw) => {
               const match = zestaw.match(/([A-Z_]+)(\d*)/);
               return match ? { text: match[1], number: parseInt(match[2], 10) || 0 } : { text: '', number: 0 };
             };
-            
             const zestawA = parseZestaw(a.zestaw);
             const zestawB = parseZestaw(b.zestaw);
             
@@ -100,7 +89,6 @@ const QuestionsList = ({
             : a[sortBy] - b[sortBy];
         });
       }
-  
       setFilteredQuestions(updatedQuestions);
     };
   
@@ -144,6 +132,8 @@ const QuestionsList = ({
           zestaw: row['zestaw'] || '',
           rating: row['rating'] || '',
           answer: row['answer'] || '',
+          aiAnswer: row['ai-answer'], // New column for AI Answer
+          law: row['law'] // New column for Law
         }));
         addNextQuestions(importedQuestions);
       },
@@ -164,6 +154,8 @@ const QuestionsList = ({
           zestaw: row['zestaw'] || '',
           rating: row['rating'] || '',
           answer: row['answer'] || '',
+          aiAnswer: row['ai-answer'], // New column for AI Answer
+          law: row['law'] // New column for Law
         }));
         addQuestions(importedQuestions);
       },
@@ -305,7 +297,7 @@ const QuestionsList = ({
     const csv = Papa.unparse(questions, {
       header: true,
       delimiter: ";",
-      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer"]
+      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "ai-answer", "law"]
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -351,7 +343,7 @@ const QuestionsList = ({
     const csv = Papa.unparse(questions, {
       header: true,
       delimiter: ";",
-      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer"]
+      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "ai-answer", "law"]
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -439,11 +431,6 @@ const QuestionsList = ({
     }
   }, [questions, signedIn]);
 
-  /*useEffect(() => {
-    if (signedIn) {
-      loadAutosaveAndReplace();
-    }
-  }, [signedIn]);*/
 
   const removeOldestFiles = async () => {
     try {
@@ -573,8 +560,6 @@ const QuestionsList = ({
       console.error('Error loading autosave:', error);
     }
   };
-  
-
 
   return (
     <div className="questions-list">
@@ -658,6 +643,8 @@ const QuestionsList = ({
           <div className="column">Kat.</div>
           <div className="column">Zest.</div>
           <div className="column">Rat.</div>
+          {/*<div className="column">AI</div>
+          <div className="column">Law</div>*/}
         </div>
         <div className="question-info">
           <p>Total Questions: {filteredQuestions.length}</p>
@@ -680,6 +667,9 @@ const QuestionsList = ({
               <div className="column">{question.kategoria}</div>
               <div className="column">{question.zestaw}</div>
               <div className={getRatingClass(question.rating)}>{question.rating}</div>
+              {/*<div className="column">{question.aiAnswer}</div>
+              <div className="column">{question.law}</div>*/}
+
               <div className="actions">
                 <button onClick={(e) => handleEdit(question.id, e)} className="action-button">
                   <FontAwesomeIcon icon={faEdit} />

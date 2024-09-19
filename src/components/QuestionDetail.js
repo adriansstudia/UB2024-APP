@@ -3,14 +3,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './QuestionDetail.css'; // Import the CSS file
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit, faExpand } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit, faExpand, faSave } from '@fortawesome/free-solid-svg-icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import the Quill CSS
 import { useSwipeable } from 'react-swipeable';
 
 
 
-const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
+const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAnswer, updateLaw}) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -22,7 +22,14 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
   const [sortedAndFilteredQuestions, setSortedAndFilteredQuestions] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAIAnswerVisible, setIsAIAnswerVisible] = useState(false);
-  const [aiAnswerContent, setAiAnswerContent] = useState('<p>AI answer content</p>');
+  const [isAIAnswerEdited, setIsAIAnswerEdited] = useState(false);
+
+  const [aiAnswerContent, setAiAnswerContent] = useState('');
+
+  const [isLawVisible, setIsLawVisible] = useState(false);
+  const [lawContent, setLawContent] = useState('');
+
+
   const [animationClass, setAnimationClass] = useState('');
 
   const toggleFullscreen = () => {
@@ -98,18 +105,28 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
 
     const foundQuestion = updatedQuestions.find(q => q.id === id);
     setQuestion(foundQuestion);
-    setIsAnswerRevealed(false);
-    setRating(foundQuestion && !isNaN(parseInt(foundQuestion.rating, 10)) ? parseInt(foundQuestion.rating, 10) : '');
+    if (foundQuestion) {
+      setAiAnswerContent(foundQuestion['aiAnswer'] || '');
+      setLawContent(foundQuestion['law'] || '');
+      setIsAnswerRevealed(false);
+      setRating(foundQuestion && !isNaN(parseInt(foundQuestion.rating, 10)) ? parseInt(foundQuestion.rating, 10) : '');
+    }
   }, [id, questions, sortBy, filterBy]);
 
 
-  // Adjust swipe sensitivity
   const swipeHandlers = useSwipeable({
+    onSwipedUp: () => handleSwipeUp(),
     onSwipedLeft: () => handleSwipe(1),
     onSwipedRight: () => handleSwipe(-1),
     swipeDuration: 500,  // Increase this value to allow longer swipe durations
     delta: 50,  // Increase this value to require a larger swipe distance
   });
+  
+  const handleSwipeUp = () => {
+    if (!isAnswerRevealed) {
+      handleRevealAnswer();
+    }
+  };
 
   const handleSwipe = (offset) => {
     const currentIndex = sortedAndFilteredQuestions.findIndex(q => q.id === question.id);
@@ -167,17 +184,33 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
   };
 
   const handleAiAnswerChange = (content) => setAiAnswerContent(content);
+  const handleLawChange = (content) => setLawContent(content);
+
   const handleRevealAIAnswer = () => setIsAIAnswerVisible(true);
   const handleHideAIAnswer = () => setIsAIAnswerVisible(false);
+  const handleAIAnswerEdit = () => setIsAIAnswerEdited(true);
+  const handleAIAnswerHide = () => setIsAIAnswerEdited(false);
 
+  const handleRevealLaw = () => setIsLawVisible(true);
+  const handleHideLaw = () => setIsLawVisible(false);
 
+  const handleSaveAIAnswer = () => {
+    if (question) {
+      updateAIAnswer(question.id, aiAnswerContent);
+    }
+  };
+
+  const handleSaveLaw = () => {
+    if (question) {
+      updateLaw(question.id, lawContent);
+    }
+  };
 
   return (
     <div className="question-detail-background">
         <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-
         <button className="fullscreen-button" onClick={toggleFullscreen}><FontAwesomeIcon icon={faExpand} /></button>
 
         <FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={handleEditClick} />
@@ -189,16 +222,41 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
         <FontAwesomeIcon icon={faAnglesLeft} className="prev-arrow" onClick={handlePrevious} />
         <FontAwesomeIcon icon={faAnglesRight} className="next-arrow" onClick={handleNext} />
 
-        {!isAIAnswerVisible && (
+          {!isAIAnswerVisible && (
             <button className="ai-answer-button" onClick={handleRevealAIAnswer}>
               AI
             </button>
           )}
           {isAIAnswerVisible && (
-            <button className="hide-button-ai" onClick={handleHideAIAnswer}>
-              Hide AI
+            <>
+              <button className="hide-button-ai" onClick={() => setIsAIAnswerVisible(false)}>
+                Hide AI
+              </button>
+              <button className="save-button-ai" onClick={handleSaveAIAnswer}>
+                <FontAwesomeIcon icon={faSave} />
+              </button>
+              <FontAwesomeIcon icon={faEdit} className="law-hide-button" onClick={handleAIAnswerEdit} />
+            </>
+          )}
+
+          {!isLawVisible && (
+            <button className="law-button" onClick={handleRevealLaw}>
+              Law
             </button>
           )}
+          {isLawVisible && (
+            <>
+              <button className="law-hide-button" onClick={() => setIsLawVisible(false)}>
+                Hide Law
+              </button>
+              <button className="save-button-ai" onClick={handleSaveLaw}>
+                <FontAwesomeIcon icon={faSave} />
+              </button>
+
+            </>
+          )}
+
+
           {isAnswerRevealed && (
             <button className="hide-button" onClick={handleHideAnswer}>
               Hide Answer
@@ -208,6 +266,19 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
             Reveal Answer
           </button>
 
+          {isAIAnswerEdited && (
+            <>
+              <button className="hide-button-ai" onClick={() => setIsAIAnswerEdited(false)}>
+                Hide AI
+              </button>
+              <button className="save-button-ai" onClick={handleSaveAIAnswer}>
+                <FontAwesomeIcon icon={faSave} />
+
+              </button>
+              <FontAwesomeIcon icon={faEdit} className="law-hide-button" onClick={handleAIAnswerHide} />
+            </>
+          )}
+          
 
       <div {...swipeHandlers} className={`question-detail ${getBackgroundClass(question.kategoria)} ${animationClass}`}>
         
@@ -226,14 +297,18 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
         <h2>{question.question}</h2>
 
         <div className="question-content">
-
-
           <div className={`answer-container ${isAnswerRevealed ? 'revealed' : ''}`}>
             <div dangerouslySetInnerHTML={{ __html: question.answer }} />
           </div>
 
-
           <div className={`ai-answer-container ${isAIAnswerVisible ? 'revealed' : ''}`}>
+            <div className="ai-answer-editor" dangerouslySetInnerHTML={{ __html: question.aiAnswer }} />
+                          
+          </div>
+
+
+
+          <div className={`ai-answer-container ${isAIAnswerEdited ? 'revealed' : ''}`}>
             <ReactQuill 
               className="ai-answer-editor"
               theme="snow"
@@ -241,8 +316,16 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy }) => {
               onChange={handleAiAnswerChange}
             />
           </div>
-
-
+            
+          <div className={`law-container ${isLawVisible ? 'revealed' : ''}`}>
+            <div className="ai-answer-editor" dangerouslySetInnerHTML={{ __html: question.law }} />
+            {/* <ReactQuill 
+              className="ai-answer-editor"
+              theme="snow"
+              value={aiAnswerContent}
+              onChange={handleAiAnswerChange}
+            /> */}
+          </div>
         </div>
 
         {showRatingPopup && (

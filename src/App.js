@@ -132,7 +132,9 @@ function App() {
             kategoria: row.kategoria,
             zestaw: row.zestaw,
             rating: row.rating,
-            answer: row.answer
+            answer: row.answer,
+            aiAnswer: row.aiAnswer,
+            law: row.law
           }));
           setQuestions(newQuestions);
           localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newQuestions));
@@ -147,6 +149,23 @@ function App() {
   const clearAllQuestions = () => {
     setQuestions([]); // Clear the questions array
   };
+
+  const updateAIAnswer = (questionId, newContent) => {
+    setQuestions(prevQuestions =>
+      prevQuestions.map(q =>
+        q.id === questionId ? { ...q, aiAnswer: newContent } : q
+      )
+    );
+  };
+
+  const updateLaw = (questionId, newContent) => {
+    setQuestions(prevQuestions =>
+      prevQuestions.map(q =>
+        q.id === questionId ? { ...q, law: newContent } : q
+      )
+    );
+  };
+  
   
   return (
     <Router>
@@ -185,6 +204,8 @@ function App() {
                 updateRating={updateRating}
                 sortBy={sortBy}
                 filterBy={filterBy}
+                updateAIAnswer={updateAIAnswer}
+                updateLaw={updateLaw}
               />
             }
           />
