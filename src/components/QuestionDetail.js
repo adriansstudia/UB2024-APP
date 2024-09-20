@@ -27,6 +27,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
   const [aiAnswerContent, setAiAnswerContent] = useState('');
 
   const [isLawVisible, setIsLawVisible] = useState(false);
+  const [isLawEdited, setIsLawEdited] = useState(false);
   const [lawContent, setLawContent] = useState('');
 
 
@@ -160,6 +161,10 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
     if (nextQuestion) {
       setCurrentSlide(currentSlide + offset);
       setTimeout(() => navigate(`/UB2024-APP/question/${nextQuestion.id}`), 300);
+      setIsLawEdited(false);
+      setIsLawVisible(false);
+      setIsAIAnswerEdited(false);
+      setIsAIAnswerVisible(false);
     }
   };
 
@@ -190,6 +195,8 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
   const handleHideAIAnswer = () => setIsAIAnswerVisible(false);
   const handleAIAnswerEdit = () => setIsAIAnswerEdited(true);
   const handleAIAnswerHide = () => setIsAIAnswerEdited(false);
+  const handleLawEdit = () => setIsLawEdited(true);
+  const handleLawHide = () => setIsLawEdited(false);
 
   const handleRevealLaw = () => setIsLawVisible(true);
   const handleHideLaw = () => setIsLawVisible(false);
@@ -206,6 +213,28 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
     }
   };
 
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, false] }],             // Header levels
+      ['bold', 'italic', 'underline'],           // Bold, Italic, Underline
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Ordered and unordered lists
+      [{ 'color': [] }, { 'background': [] }],   // Text color and background color
+      [{ 'align': [] }],                         // Align text (left, center, right, justify)
+      ['link', 'image'],                         // Insert link and image
+    ],
+    clipboard: {
+      matchVisual: false // Prevent weird styles from pasting content
+    }
+  };
+
+  const modulesHidden = {
+    toolbar: false,
+    clipboard: {
+      matchVisual: false // Prevent weird styles from pasting content
+    }
+  };
+
+  
   return (
     <div className="question-detail-background">
         <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
@@ -252,7 +281,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
               <button className="save-button-ai" onClick={handleSaveLaw}>
                 <FontAwesomeIcon icon={faSave} />
               </button>
-
+              <FontAwesomeIcon icon={faEdit} className="hide-button-ai" onClick={handleLawEdit} />
             </>
           )}
 
@@ -278,6 +307,19 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
               <FontAwesomeIcon icon={faEdit} className="law-hide-button" onClick={handleAIAnswerHide} />
             </>
           )}
+
+          {isLawEdited && (
+            <>
+              <button className="law-hide-button" onClick={() => setIsLawEdited(false)}>
+                Hide Law
+              </button>
+              <button className="save-button-ai" onClick={handleSaveLaw}>
+                <FontAwesomeIcon icon={faSave} />
+
+              </button>
+              <FontAwesomeIcon icon={faEdit} className="hide-button-ai" onClick={handleLawHide} />
+            </>
+          )}
           
 
       <div {...swipeHandlers} className={`question-detail ${getBackgroundClass(question.kategoria)} ${animationClass}`}>
@@ -298,35 +340,67 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
 
         <div className="question-content">
           <div className={`answer-container ${isAnswerRevealed ? 'revealed' : ''}`}>
-            <div dangerouslySetInnerHTML={{ __html: question.answer }} />
+            {/* <div dangerouslySetInnerHTML={{ __html: question.answer }} /> */}
+            <ReactQuill 
+              className="ai-answer-editor"
+              theme="snow"
+              value={question.answer}
+              modules={modulesHidden}
+              readOnly= {true}    
+            />        
           </div>
 
           <div className={`ai-answer-container ${isAIAnswerVisible ? 'revealed' : ''}`}>
-            <div className="ai-answer-editor" dangerouslySetInnerHTML={{ __html: question.aiAnswer }} />
-                          
+            <ReactQuill 
+              className="ai-answer-editor"
+              theme="snow"
+              value={aiAnswerContent}
+              modules={modulesHidden}
+              readOnly= {true}    
+            />                        
           </div>
+          <div className={`bottom-mask ${isAIAnswerVisible ? 'revealed' : ''}`}></div>
 
 
-
-          <div className={`ai-answer-container ${isAIAnswerEdited ? 'revealed' : ''}`}>
+          <div className={`ai-answer-container-ed ${isAIAnswerEdited ? 'revealed' : ''}`}>
             <ReactQuill 
               className="ai-answer-editor"
               theme="snow"
               value={aiAnswerContent}
               onChange={handleAiAnswerChange}
+              modules={modules}
+              readOnly= {false}    
             />
+            
           </div>
+          
             
           <div className={`law-container ${isLawVisible ? 'revealed' : ''}`}>
-            <div className="ai-answer-editor" dangerouslySetInnerHTML={{ __html: question.law }} />
-            {/* <ReactQuill 
+            <ReactQuill 
               className="ai-answer-editor"
               theme="snow"
-              value={aiAnswerContent}
-              onChange={handleAiAnswerChange}
-            /> */}
+              value={lawContent}
+              onChange={handleLawChange}
+              modules={modulesHidden}
+              readOnly= {true}    
+            />
           </div>
+          <div className={`bottom-mask ${isLawVisible ? 'revealed' : ''}`}></div>
+
+          <div className={`law-container-ed ${isLawEdited ? 'revealed' : ''}`}>
+            <ReactQuill 
+              className="ai-answer-editor"
+              theme="snow"
+              value={lawContent}
+              onChange={handleLawChange}
+              modules={modules}
+              readOnly= {false}    
+            />
+          </div>
+          <div className={`bottom-mask ${isLawEdited ? 'revealed' : ''}`}></div>
         </div>
+
+
 
         {showRatingPopup && (
           <div className="rating-popup">

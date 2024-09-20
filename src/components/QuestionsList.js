@@ -132,7 +132,7 @@ const QuestionsList = ({
           zestaw: row['zestaw'] || '',
           rating: row['rating'] || '',
           answer: row['answer'] || '',
-          aiAnswer: row['ai-answer'], // New column for AI Answer
+          aiAnswer: row['aiAnswer'], // New column for AI Answer
           law: row['law'] // New column for Law
         }));
         addNextQuestions(importedQuestions);
@@ -154,7 +154,7 @@ const QuestionsList = ({
           zestaw: row['zestaw'] || '',
           rating: row['rating'] || '',
           answer: row['answer'] || '',
-          aiAnswer: row['ai-answer'], // New column for AI Answer
+          aiAnswer: row['aiAnswer'], // New column for AI Answer
           law: row['law'] // New column for Law
         }));
         addQuestions(importedQuestions);
@@ -170,8 +170,6 @@ const QuestionsList = ({
       .catch(error => console.error('Error loading default CSV:', error));
   };
 
-  const handleSaveState = () => console.log('Save State clicked');
-  const handleLoadState = (e) => console.log('Load State clicked');
 
   const handleClearAll = () => {
     clearAllQuestions()
@@ -297,7 +295,7 @@ const QuestionsList = ({
     const csv = Papa.unparse(questions, {
       header: true,
       delimiter: ";",
-      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "ai-answer", "law"]
+      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -343,7 +341,7 @@ const QuestionsList = ({
     const csv = Papa.unparse(questions, {
       header: true,
       delimiter: ";",
-      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "ai-answer", "law"]
+      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
