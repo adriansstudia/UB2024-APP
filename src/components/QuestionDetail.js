@@ -215,7 +215,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
 
   const modules = {
     toolbar: [
-      [{ 'header': [1, 2, false] }],             // Header levels
+      // [{ 'header': [1, 2, false] }],             // Header levels
       ['bold', 'italic', 'underline'],           // Bold, Italic, Underline
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Ordered and unordered lists
       [{ 'color': [] }, { 'background': [] }],   // Text color and background color
