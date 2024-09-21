@@ -3,12 +3,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './QuestionDetail.css'; // Import the CSS file
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit, faExpand, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit, faExpand, faSave, faCircle, faUpload } from '@fortawesome/free-solid-svg-icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import the Quill CSS
 import { useSwipeable } from 'react-swipeable';
+import Papa from 'papaparse';
 
 
+const BASE_FILENAME = 'UB2024-APP_autosave_'; // Base filename for autosaves
 
 const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAnswer, updateLaw}) => {
   const { id } = useParams();
@@ -29,9 +31,209 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
   const [isLawVisible, setIsLawVisible] = useState(false);
   const [isLawEdited, setIsLawEdited] = useState(false);
   const [lawContent, setLawContent] = useState('');
+  const [isSaved, setIsSaved] = useState(false);
 
 
   const [animationClass, setAnimationClass] = useState('');
+
+  const [currentAutosaveFilename, setCurrentAutosaveFilename] = useState('');
+  const [autosaveEnabled, setAutosaveEnabled] = useState(false); // State for checkbox
+  const [autosaveInterval, setAutosaveInterval] = useState(null); // State for autosave interval
+
+
+  const getFolderId = async (folderName) => {
+    try {
+      const response = await window.gapi.client.drive.files.list({
+        'q': `name = '${folderName}' and mimeType = 'application/vnd.google-apps.folder'`,
+      });
+      const folders = response.result.files;
+      if (folders.length > 0) return folders[0].id;
+
+      const createResponse = await window.gapi.client.drive.files.create({
+        resource: {
+          name: folderName,
+          mimeType: 'application/vnd.google-apps.folder',
+        },
+        fields: 'id',
+      });
+      return createResponse.result.id;
+    } catch (error) {
+      console.error('Error getting or creating folder:', error);
+    }
+  };
+// Function to upload CSV to Google Drive
+const uploadCSVToDrive = async (blob, fileName) => {
+  try {
+    const folderId = await getFolderId('UB2024-APP');
+
+    const fileMetadata = {
+      name: fileName,
+      mimeType: 'text/csv',
+      parents: [folderId]
+    };
+
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
+    form.append('file', blob);
+
+    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
+      headers: new Headers({ 'Authorization': `Bearer ${window.gapi.client.getToken().access_token}` }),
+      body: form
+    });
+
+    if (!response.ok) throw new Error('Failed to upload autosave file');
+    
+    // If upload was successful, return true
+    return true;
+  } catch (error) {
+    console.error('Error uploading autosave to Drive:', error);
+    // If there was an error, return false
+    return false;
+  }
+};
+
+const autosave = async () => {
+  const now = new Date();
+  now.setHours(now.getHours() + 2); // Adjust for UTC+2
+
+  const dateString = now.toISOString().replace(/T/, '___').replace(/:/g, '-').replace(/\.\d+Z$/, '');
+  const filename = `${BASE_FILENAME}${dateString}.csv`;
+
+  const csv = Papa.unparse(questions, {
+    header: true,
+    delimiter: ";",
+    columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+  // Call uploadCSVToDrive and wait for the result
+  const isSaved = await uploadCSVToDrive(blob, filename);
+  
+  // Update the state based on whether the upload was successful
+  setIsSaved(isSaved); // Assuming you have a useState for isSaved
+
+  setCurrentAutosaveFilename(filename); // Update filename display
+};
+
+
+
+
+  const handleAutosave = async () => {
+    const savedStatus = await autosave();
+    setIsSaved(savedStatus); // Update state based on autosave result
+  };
+
+  // Call handleAutosave whenever you want to trigger the autosave
+
+  
+  
+  const startAutosave = () => {
+    if (autosaveEnabled) return; // Only start if not already enabled
+  
+    setAutosaveEnabled(true); // Update state
+    localStorage.setItem('autosaveEnabled', true); // Persist to localStorage
+  };
+  
+  const stopAutosave = () => {
+    if (autosaveInterval) {
+      clearInterval(autosaveInterval); // Clear the interval
+      setAutosaveInterval(null); // Reset interval state
+    }
+    setAutosaveEnabled(false); // Update state
+    localStorage.setItem('autosaveEnabled', false); // Persist to localStorage
+  };
+
+  const removeOldestFiles = async () => {
+    try {
+      // Get folder ID
+      const folderId = await getFolderId('UB2024-APP');
+  
+      // List all files in the folder with filenames starting with 'UB2024-APP_autosave_'
+      const response = await window.gapi.client.drive.files.list({
+        q: `'${folderId}' in parents and name contains 'UB2024-APP_autosave_'`,
+        fields: 'files(id, name)',
+      });
+  
+      const files = response.result.files;
+  
+      if (files.length <= 5) {
+        console.log('No need to delete files, less than or equal to 5 autosaves present');
+        return;
+      }
+  
+      // Sort files based on the timestamp in the filename
+      const sortedFiles = files.sort((a, b) => {
+        const matchA = a.name.match(/UB2024-APP_autosave_(\d{4}-\d{2}-\d{2}___\d{2}-\d{2}-\d{2})/);
+        const matchB = b.name.match(/UB2024-APP_autosave_(\d{4}-\d{2}-\d{2}___\d{2}-\d{2}-\d{2})/);
+  
+        if (!matchA || !matchB) {
+          console.error('Filename does not match expected pattern:', a.name, b.name);
+          return 0;
+        }
+  
+        const timeA = matchA[1];
+        const timeB = matchB[1];
+  
+        return timeB.localeCompare(timeA); // Latest first
+      });
+  
+      // Debugging: Log sorted files to check the order
+      console.log('Sorted files (newest first):', sortedFiles);
+  
+      // Remove oldest files if more than 5 exist
+      const filesToDelete = sortedFiles.slice(5); // Get files older than the 5 newest
+  
+      // Debugging: Log files to be deleted
+      console.log('Files to delete:', filesToDelete);
+  
+      for (const file of filesToDelete) {
+        await window.gapi.client.drive.files.delete({
+          fileId: file.id,
+        });
+        console.log(`Deleted file: ${file.name}`);
+      }
+  
+    } catch (error) {
+      console.error('Error removing oldest autosave files:', error);
+    }
+  };
+
+
+
+
+  // Clean up interval when component unmounts
+  useEffect(() => {
+    return () => {
+      startAutosave();
+    }
+  }, []);
+  useEffect(() => {
+    // Only set up the autosave interval if autosave was explicitly enabled
+    if (autosaveEnabled) {
+      // First, perform an immediate autosave
+      autosave(); // Call autosave immediately when the effect runs
+  
+      const interval = setInterval(() => {
+        if (autosaveEnabled) {
+          autosave(); // Call autosave only if enabled
+        }
+      }, 10000); // Autosave every 10 seconds
+  
+      setAutosaveInterval(interval); // Save interval ID to state
+  
+      // Cleanup interval on component unmount
+      return () => {
+        clearInterval(interval);
+        setAutosaveInterval(null);
+        startAutosave(); // Ensure we don't leave intervals hanging
+      };
+    }
+  }, [autosaveEnabled]); // Re-run only if autosaveEnabled changes
+  
+
+
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement &&    // Standard browsers
@@ -155,6 +357,8 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
 
   const handleCloseRatingPopup = () => setShowRatingPopup(false);
 
+
+
   const navigateQuestion = (offset) => {
     const currentIndex = sortedAndFilteredQuestions.findIndex(q => q.id === question.id);
     const nextQuestion = sortedAndFilteredQuestions[currentIndex + offset];
@@ -234,13 +438,25 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
     }
   };
 
+
   
+
   return (
     <div className="question-detail-background">
         <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
         <button className="fullscreen-button" onClick={toggleFullscreen}><FontAwesomeIcon icon={faExpand} /></button>
+
+        <div className=""style={{ display: isSaved ? 'block' : 'none' }}>
+          <button className="online-yellow" style={{ display: autosaveEnabled ? 'none' : 'block' }} onClick={startAutosave}><FontAwesomeIcon icon={faCircle} />eAS</button>
+        </div>
+        <div className=""style={{ display: isSaved ? 'block' : 'none' }}>
+          <button className="online-green" style={{ display: autosaveEnabled ? 'block' : 'none' }}  onClick={stopAutosave} ><FontAwesomeIcon icon={faCircle} />dAS</button>
+        </div>
+        <div className=""style={{ display: isSaved ? 'none' : 'block' }}>
+          <button className="online-red" style={{ display: autosaveEnabled ? 'block' : 'none' }} onClick={stopAutosave} ><FontAwesomeIcon icon={faCircle} /></button>
+        </div>
 
         <FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={handleEditClick} />
         <strong className="question-index">

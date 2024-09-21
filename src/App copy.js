@@ -9,8 +9,6 @@ import MainTab from './components/MainTab';
 import QuestionsList from './components/QuestionsList';
 import QuestionDetail from './components/QuestionDetail';
 import EditQuestion from './components/EditQuestion';
-import { FullScreenProvider } from './components/FullScreen';
-
 import './App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Papa from 'papaparse';
@@ -215,7 +213,6 @@ function App() {
             path="/UB2024-APP/edit/:id"
             element={<EditQuestion questions={questions} saveQuestion={updateQuestion} />}
           />
-          
         </Routes>
       </div>
     </Router>

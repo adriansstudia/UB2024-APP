@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faEllipsisV, faEdit, faTrashAlt, faExpand, faSortUp, faCircle, faUpload, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faEllipsisV, faEdit, faTrashAlt, faExpand, faSortUp, faL } from '@fortawesome/free-solid-svg-icons';
 import './QuestionsList.css'; // Import your custom styles
 
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
@@ -40,42 +40,6 @@ const QuestionsList = ({
   const [menuVisible, setMenuVisible] = useState(false); // State to control menu visibility
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const savedAutosaveState = localStorage.getItem('autosaveEnabled');
-  //   if (savedAutosaveState) {
-  //     setAutosaveEnabled(JSON.parse(savedAutosaveState));
-  //   }
-  // }, []);
-
-  // Clean up interval when component unmounts
-  useEffect(() => {
-     return () => {
-       startAutosave();
-     }
-   }, []);
-  useEffect(() => {
-    // Only set up the autosave interval if autosave was explicitly enabled
-
-    if (autosaveEnabled) {
-      // First, perform an immediate autosave
-      autosave(); // Call autosave immediately when the effect runs
-  
-      const interval = setInterval(() => {
-        if (autosaveEnabled) {
-          autosave(); // Call autosave only if enabled
-        }
-      }, 10000); // Autosave every 10 seconds
-  
-      setAutosaveInterval(interval); // Save interval ID to state
-  
-      // Cleanup interval on component unmount
-      return () => {
-        clearInterval(interval);
-        setAutosaveInterval(null); // Ensure we don't leave intervals hanging
-      };
-    }
-  }, [autosaveEnabled]); // Re-run only if autosaveEnabled changes
-  
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement &&    // Standard browsers
@@ -302,7 +266,6 @@ const QuestionsList = ({
       localStorage.removeItem('authToken');
       window.gapi.client.setToken('');
       setSignedIn(false);
-      
     }
   };
 
@@ -313,7 +276,6 @@ const QuestionsList = ({
       if (token) {
         window.gapi.client.setToken({ access_token: token });
         setSignedIn(true);
-        
       }
     }
   };
@@ -420,41 +382,51 @@ const QuestionsList = ({
     removeOldestFiles();
   };
 
-  const autosave = () => {
-    const now = new Date();
-    now.setHours(now.getHours() + 2); // Adjust for UTC+2
-  
-    const dateString = now.toISOString().replace(/T/, '___').replace(/:/g, '-').replace(/\.\d+Z$/, '');
-    const filename = `${BASE_FILENAME}${dateString}.csv`;
-  
-    const csv = Papa.unparse(questions, {
-      header: true,
-      delimiter: ";",
-      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
-    });
-  
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  
-    if (signedIn) {
-      uploadCSVToDrive(blob, filename);
-      setCurrentAutosaveFilename(filename); // Update filename display
-    }
-  };
-  
+
+  // Start autosaving function
   const startAutosave = () => {
-    if (autosaveEnabled) return; // Only start if not already enabled
-  
-    setAutosaveEnabled(true); // Update state
+    if (autosaveEnabled) return; // Avoid starting it again if already enabled
+
+    setAutosaveEnabled(true);
     localStorage.setItem('autosaveEnabled', true); // Persist to localStorage
+
+    const interval = setInterval(() => {
+      autosave(); // Call the autosave function
+    }, 10000); // Autosave every 10 seconds
+
+    setAutosaveInterval(interval); // Save interval ID to state
   };
-  
+
+  // Stop autosaving function
   const stopAutosave = () => {
     if (autosaveInterval) {
       clearInterval(autosaveInterval); // Clear the interval
       setAutosaveInterval(null); // Reset interval state
     }
-    setAutosaveEnabled(false); // Update state
+    setAutosaveEnabled(false);
     localStorage.setItem('autosaveEnabled', false); // Persist to localStorage
+  };
+
+  // The autosave function
+  const autosave = () => {
+    const now = new Date();
+    now.setHours(now.getHours() + 2); // Adjust for UTC+2
+
+    const dateString = now.toISOString().replace(/T/, '___').replace(/:/g, '-').replace(/\.\d+Z$/, '');
+    const filename = `${BASE_FILENAME}${dateString}.csv`;
+
+    const csv = Papa.unparse(questions, {
+      header: true,
+      delimiter: ";",
+      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+    if (signedIn) {
+      uploadCSVToDrive(blob, filename);
+      setCurrentAutosaveFilename(filename); // Update filename display
+    }
   };
 
   const removeOldestFiles = async () => {
@@ -596,10 +568,6 @@ const QuestionsList = ({
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
         <button className="fullscreen-button" onClick={toggleFullscreen}><FontAwesomeIcon icon={faExpand} /></button>
-
-        <button className="save-main1" onClick={autosave}><FontAwesomeIcon icon={faSave} /></button>
-        <button className="save-main2" onClick={loadAutosaveAndReplace}><FontAwesomeIcon icon={faUpload} /></button>
-
         <button className="hamburger-menu" onClick={toggleMenu}>
           &#9776; {/* Hamburger icon */}
         </button>
@@ -607,29 +575,17 @@ const QuestionsList = ({
           <input type="checkbox" checked={autosaveEnabled} onChange={handleCheckboxChange} />
           eAs
         </label> */}
-        <div className=""style={{ display: signedIn ? 'block' : 'none' }}>
-          <button className="online-yellow" style={{ display: autosaveEnabled ? 'none' : 'block' }} onClick={startAutosave}><FontAwesomeIcon icon={faCircle} />eAS</button>
-        </div>
-        <div className=""style={{ display: signedIn ? 'block' : 'none' }}>
-          <button className="online-green" style={{ display: autosaveEnabled ? 'block' : 'none' }}  onClick={stopAutosave} ><FontAwesomeIcon icon={faCircle} />dAS</button>
-        </div>
-        <div className=""style={{ display: signedIn ? 'none' : 'block' }}>
-          <button className="online-red" style={{ display: autosaveEnabled ? 'block' : 'none' }} onClick={stopAutosave} ><FontAwesomeIcon icon={faCircle} /></button>
-        </div>
-        <div className=""style={{ display: signedIn ? 'none' : 'block' }}>
-          <button className="online-red" style={{ display: autosaveEnabled ? 'none' : 'block' }} onClick={stopAutosave} ><FontAwesomeIcon icon={faCircle} /></button>
-        </div>
+        <button onClick={startAutosave} disabled={autosaveEnabled}>Enable Autosave</button>
+        <button onClick={stopAutosave} disabled={!autosaveEnabled}>Disable Autosave</button>
       
         
-        <div onClick={stopAutosave}>
-          <button onClick={handleAuthClick} style={{ display: signedIn ? 'none' : 'block' }}className="sign">
-            Sign In
-          </button>
         
-          <button onClick={handleSignoutClick} style={{ display: signedIn ? 'block' : 'none' }}className="sign">
-            Sign Out
-          </button>
-        </div>
+        <button onClick={handleAuthClick} style={{ display: signedIn ? 'none' : 'block' }}className="sign">
+          Sign In
+        </button>
+        <button onClick={handleSignoutClick} style={{ display: signedIn ? 'block' : 'none' }}className="sign">
+          Sign Out
+        </button>
         {/* Rollable button container */}
         <div className={`menu ${menuVisible ? 'show' : 'hide'}`}>
             <button onClick={() => document.getElementById('import-file').click()} className="menu-button">
@@ -676,9 +632,8 @@ const QuestionsList = ({
               ))}
             </select>
           </div>
-          {/* <button className="save-main1" onClick={autosave}>Save St</button>
-          <button className="save-main2" onClick={loadAutosaveAndReplace}>Load AS</button> */}
-
+          <button className="save-main1" onClick={autosave}>Save St</button>
+          <button className="save-main2" onClick={loadAutosaveAndReplace}>Load AS</button>
           <div className="question-info">
             <p>Total Questions: {filteredQuestions.length}</p>
           </div>
