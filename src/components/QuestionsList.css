@@ -1,12 +1,29 @@
+/* Background Container */
+.question-list-background {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.7)); /* Gradient background */
+  height: 100vh; /* Full viewport height */
+  overflow: auto; /* Allow scrolling if content exceeds viewport */
+  padding: 0px; /* Padding to ensure content does not touch the edges */
+
+}
+
 /* Base Styles */
 .questions-list {
-  font-family: Roboto, sans-serif;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)); /* Gradient background */
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: relative;
-  min-height: 100vh;
+  font-family: 'Open Sans', sans-serif;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 5px;
+  margin: 10px; /* Uniform margin on all sides */
+  margin-top: 60px!important;
+  border-radius: 18px;
+  box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  position: relative; /* For positioning internal elements */
+  overflow: hidden;
+  overflow-y: auto; /* Allow scrolling for overflowing content */
+  box-sizing: border-box; /* Include padding and border in width/height calculations */
+  width: calc(100% - 20px); /* Adjust width to account for the margin */
+  height: calc(100vh - 70px); /* Adjust height to account for the margin */
+
 }
 
 /* Header */
@@ -15,85 +32,111 @@
   flex-direction: column;
   align-items: flex-end;
   margin-bottom: 20px;
+  top: 50px;
 }
 
-.header button {
-  background: transparent;
+
+/* Hamburger menu button */
+.sign, .save-main, .save-checkbox, .hamburger-menu {
+  font-size: 25px;
+  color: white;
+  left: 45%;
+  position: fixed;
+  background-color: transparent;
   border: none;
-  font-size: 24px;
-  color: #888;
   cursor: pointer;
+  padding: 10px;
 }
 
-.menu-icon {
-  font-size: 20px;
-  color: rgba(0, 0, 0, 0.7);
-  cursor: pointer;
+.save-checkbox {
+  left: 80%;
+  font-size: 15px;
+  top: 10px;
 }
 
-.menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background-color: rgba(255, 255, 255, 0.5);
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  min-width: 120px;
+.sign {
+  left: 60%;
+  font-size: 15px;
+  top: 10px;
 }
 
-.menu-button {
-  font-size: 18px;
+.save-main1, .save-main2{
   display: block;
-  background: transparent;
+  position: absolute;
+  padding: 5px;
+  margin-top: 0px;
+  left: 15px;
+  font-size: 15px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  color: white;
   border: none;
-  padding: 15px;
-  margin: 5px 0;
-  text-align: left;
   cursor: pointer;
-  color: #333;
-  border-radius: 4px;
-  transition: background-color 0.3s, color 0.3s;
+  text-align: left;
+}
+.save-main2{
+margin-top: 30px;
 }
 
-.menu-button:hover {
-  background-color: #f0f0f0;
-  color: #000;
+
+/* Rollable container for buttons */
+.menu {
+  background: linear-gradient(90deg, rgb(73, 73, 73), rgb(65, 65, 65), rgb(73, 73, 73));
+  max-height: 0;
+  overflow: hidden;
+  z-index: 1100;
+
 }
 
-/* Filters and Buttons */
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
+.menu.show, .menu.hide {
+  position: fixed;
+  width: calc(100% - 40px);
+  margin-top: 60px;
+  max-height: 500px; /* A large enough value to show the content */
+  transition: max-height 0.8s ease-in;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
-.filter-button,
+.menu.hide {
+  max-height: 0px; /* A large enough value to show the content */
+}
+
+
 .import-button,
 .add-button,
-.clear-button {
+.clear-button,
+.load-button,
+.menu-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  color: white;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  padding: 10px 15px;
-  font-size: 14px;
+  text-align: left;
 }
 
-.import-button { background-color: #007bff; color: #fff; }
-.add-button { background-color: #28a745; color: #fff; }
-.clear-button { background-color: #dc3545; color: #fff; }
-.filter-button {
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
-  padding: 5px;
+.filter-options,
+.filter-button{
+  position: fixed;
+  right: 40px;
+  margin-top: 10px;
+  font-size: 15px;
+  color: white;
+  background-color: rgb(65, 65, 65);
+  border: none;
+  cursor: pointer;
 }
 
 .filters button:hover,
 .filter-options select:hover,
 .filter-options button:hover {
-  background-color: #e0e0e0;
+  color: #242424;
+  background-color: #707070;
 }
 
 /* Lists and Items */
@@ -131,7 +174,7 @@ li button:hover {
 .question-header,
 .question-row {
   cursor: pointer;
-  background-color: #f5f5f5;
+  background-color: #ffffff00;
   display: grid;
   grid-template-columns: 1fr 2fr 50fr 2fr 1fr 1fr; /* Responsive columns */
   grid-gap: 5px;
@@ -145,6 +188,17 @@ li button:hover {
 .question-row .column {
   padding: 5px; /* Better spacing */
 }
+
+.column-head{
+  font-size: 10px; /* Better spacing */
+  cursor: pointer;
+  color: white;  
+}
+
+.question-info{
+  color: white;
+}
+
 
 .question-header .column:not(:first-child),
 .question-row .column:not(:first-child) {
@@ -180,24 +234,6 @@ li button:hover {
 .rating-4 { background-color: orange; }
 .rating-5 { background-color: red; }
 
-/* Highlighting 
-.highlight-p {
-  background-color: rgba(255, 255, 113, 0.1);
-}
-
-.highlight-l {
-  background-color: rgba(255, 113, 243, 0.1);
-}
-
-.highlight-pz {
-  background-color: rgba(255, 113, 113, 0.1);
-}
-
-.highlight-i {
-  background-color: rgba(113, 134, 255, 0.1);
-}*/
-
-/* Actions */
 .question-row .actions {
   grid-column: span 6;
   display: flex;

@@ -28,40 +28,46 @@ const MainTab = () => {
 
   return (
     <div className="main-tab">
-      <h1>UB2024</h1>
-      <button
-        className="lista-pytan-button"
-        onClick={() => setShowPasswordPopup(true)}
-      >
-        Lista Pytań
-      </button>
-
-      {/* Password Popup Modal */}
-      {showPasswordPopup && (
-        <div className="password-popup">
-          <div className="password-popup-content">
-            <h2>Enter Password</h2>
-            <input
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={handleKeyDown} // Add the keydown event to listen for Enter key
-              className="password-input"
-            />
-            <button onClick={handlePasswordSubmit} className="submit-password-button">
-              Submit
-            </button>
-            <button
-              onClick={() => setShowPasswordPopup(false)}
-              className="cancel-button"
-            >
-              Cancel
-            </button>
-            {errorMessage && <p className="error-message">{errorMessage}</p>}
-          </div>
+      <div className="background-overlay">
+        <div className="main-content">
+          <h1 className="main-title">UB2024</h1>
+          <button
+            className="lista-pytan-button"
+            onClick={() => setShowPasswordPopup(true)}
+          >
+            Lista Pytań
+          </button>
         </div>
-      )}
+
+        {/* Password Popup Modal */}
+        {showPasswordPopup && (
+          <div className="password-popup">
+            <div className="password-popup-content">
+              <h2>Enter Password</h2>
+              <input
+                type="password"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="password-input"
+              />
+              <div className="popup-buttons">
+                <button onClick={handlePasswordSubmit} className="submit-password-button">
+                  Submit
+                </button>
+                <button
+                  onClick={() => setShowPasswordPopup(false)}
+                  className="cancel-button"
+                >
+                  Cancel
+                </button>
+              </div>
+              {errorMessage && <p className="error-message">{errorMessage}</p>}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

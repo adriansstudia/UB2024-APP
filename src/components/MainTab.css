@@ -1,36 +1,125 @@
+/* MainTab background image and layout styling */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* Prevent scrolling */
+}
+
+/* MainTab background image and layout styling */
+.main-tab {
+  height: 100vh;
+  background-image: url('/images/background1.png'); /* Add your background image */
+  background-size: cover; /* Ensures the image covers the full height */
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.background-overlay {
+  background-color: rgba(0, 0, 0, 0.5); /* Optional overlay for readability */
+  width: 100%;
+  margin-top: -110px;
+  height: 110%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-content {
+  text-align: center;
+  color: white;
+}
+
+.main-title {
+  font-size: 4rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.lista-pytan-button {
+  background-color: #ffbb00!important;
+  color: #181818!important;
+  font-weight: bold!important;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.lista-pytan-button:hover {
+  background-color: #cccccc;
+}
+
+/* Password Popup Modal */
 .password-popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .password-popup-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-  }
-  
-  .password-input {
-    width: 80%;
-    padding: 8px;
-    margin: 10px 0;
-  }
-  
-  .submit-password-button,
-  .cancel-button {
-    padding: 8px 16px;
-    margin: 10px;
-  }
-  
-  .error-message {
-    color: red;
-    margin-top: 10px;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.password-popup-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.password-input {
+  width: 90%;
+  padding: 10px;
+  margin: 20px 0;
+  font-size: 1rem;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.submit-password-button,
+.cancel-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 45%;
+}
+
+.cancel-button {
+  background-color: #f44336;
+}
+
+.submit-password-button:hover {
+  background-color: #45a049;
+}
+
+.cancel-button:hover {
+  background-color: #e53935;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+  font-size: 0.9rem;
+}

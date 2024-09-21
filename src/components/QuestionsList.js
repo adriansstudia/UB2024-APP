@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faEllipsisV, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faEllipsisV, faEdit, faTrashAlt, faExpand, faSortUp } from '@fortawesome/free-solid-svg-icons';
 import './QuestionsList.css'; // Import your custom styles
 
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
@@ -37,9 +37,40 @@ const QuestionsList = ({
   const [currentAutosaveFilename, setCurrentAutosaveFilename] = useState('');
   const [autosaveEnabled, setAutosaveEnabled] = useState(false); // State for checkbox
   const [autosaveInterval, setAutosaveInterval] = useState(null); // State for autosave interval
+  const [menuVisible, setMenuVisible] = useState(false); // State to control menu visibility
+
 
   const navigate = useNavigate();
 
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement &&    // Standard browsers
+        !document.mozFullScreenElement && // Firefox
+        !document.webkitFullscreenElement && // Chrome, Safari, Opera
+        !document.msFullscreenElement) { // IE/Edge
+      // Enter fullscreen
+      const element = document.documentElement;
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.mozRequestFullScreen) { // Firefox
+        element.mozRequestFullScreen();
+      } else if (element.webkitRequestFullscreen) { // Chrome, Safari, Opera
+        element.webkitRequestFullscreen();
+      } else if (element.msRequestFullscreen) { // IE/Edge
+        element.msRequestFullscreen();
+      }
+    } else {
+      // Exit fullscreen
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) { // Firefox
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) { // Chrome, Safari, Opera
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { // IE/Edge
+        document.msExitFullscreen();
+      }
+    }
+  };
 
   useEffect(() => {
     const kategoriaSet = new Set(questions.map(q => q.kategoria));
@@ -559,132 +590,144 @@ const QuestionsList = ({
     }
   };
 
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible);
+  };
+
   return (
-    <div className="questions-list">
-      <header className="header">
-        <button onClick={() => navigate('/UB2024-APP/')}>
-          <FontAwesomeIcon icon={faArrowLeft} className='back-button' />
+    <div className="question-detail-background">
+        <button className="back-button" onClick={() => navigate('/UB2024-APP')}>
+          <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <div className="menu-container">
-          <FontAwesomeIcon
-            icon={faEllipsisV}
-            className="menu-icon"
-            onClick={() => setShowMenu(!showMenu)}
-          />
-          {showMenu && (
-            <div className="menu">
-              <button onClick={saveToCSV} className="menu-button">Save State</button>
-              <button onClick={() => document.getElementById('load-state-input').click()} className="menu-button">Load State</button>
-              <input
-                type="file"
-                id="load-state-input"
-                accept=".csv"
-                onChange={(e) => handleImport(e.target.files[0])}
-                style={{ display: 'none' }}
-              />
+        <button className="fullscreen-button" onClick={toggleFullscreen}><FontAwesomeIcon icon={faExpand} /></button>
+        <button className="hamburger-menu" onClick={toggleMenu}>
+          &#9776; {/* Hamburger icon */}
+        </button>
+        <label className="save-checkbox">
+          <input type="checkbox" checked={autosaveEnabled} onChange={handleCheckboxChange} />
+          eAs
+        </label>
+        <button onClick={handleAuthClick} style={{ display: signedIn ? 'none' : 'block' }}className="sign">
+          Sign In
+        </button>
+        <button onClick={handleSignoutClick} style={{ display: signedIn ? 'block' : 'none' }}className="sign">
+          Sign Out
+        </button>
+        {/* Rollable button container */}
+        <div className={`menu ${menuVisible ? 'show' : 'hide'}`}>
+            <button onClick={() => document.getElementById('import-file').click()} className="menu-button">
+              Add CSV
+            </button>
+            <input
+              type="file"
+              id="import-file"
+              accept=".csv"
+              onChange={(e) => handleImport(e.target.files[0])}
+              style={{ display: 'none' }}
+            />
+            <button onClick={handleLoadDefaultCSV} className="menu-button">
+              Load Default
+            </button>
+            <button onClick={handleClearAll} className="clear-button">
+              Clear All
+            </button>
+            <button onClick={() => navigate('/UB2024-APP/add')} className="menu-button">
+              Add
+            </button>
+            <button onClick={handleAuthClick} style={{ display: signedIn ? 'none' : 'block' }}className="menu-button">
+              Sign In
+            </button>
+            <button onClick={handleSignoutClick} style={{ display: signedIn ? 'block' : 'none' }}className="menu-button">
+              Sign Out
+            </button>
+            <button className="menu-button" onClick={saveToCSV}>Save State</button>
+            <button className="menu-button" onClick={() => autosave(questions, true)}>Autosave</button>
+
+            <button className="menu-button" onClick={loadAutosaveAndReplace}>Load Autosave</button>
+            <button className="menu-button"> Current Autosave File: {currentAutosaveFilename}</button>
+
+
+        </div>
+
+
+        <div className="questions-list">
+          <div className="sort-buttons">
+                {/* {['number', 'kategoria', 'zestaw', 'rating'].map((property) => (
+                  <button key={property} onClick={() => handleSort(property)} className="filter-button">
+                    Sort by: {property.charAt(0).toUpperCase() + property.slice(1)}
+                  </button>
+                ))} */}
+              </div>
+          <div className="filter-button">
+            <select onChange={(e) => handleFilter(e.target.value)} value={filterBy}className="filter-button">
+              <option value="">Show all</option>
+              {kategoriaOptions.map(kategoria => (
+                <option key={kategoria} value={kategoria}>{kategoria}</option>
+              ))}
+            </select>
+          </div>
+          <button className="save-main1" onClick={saveToCSV}>Save St</button>
+          <button className="save-main2" onClick={loadAutosaveAndReplace}>Load AS</button>
+          <div className="question-info">
+            <p>Total Questions: {filteredQuestions.length}</p>
+          </div>
+          <div className="question-container">
+            <div className="question-header">
+              <div className="column-head">lp</div>
+              <div onClick={() => handleSort("number")} className="column-head">Nr<FontAwesomeIcon icon={faSortUp}/></div>
+              <div className="column-head">Pytanie</div>
+              <div onClick={() => handleSort("kategoria")} className="column-head">Kat.<FontAwesomeIcon icon={faSortUp}/></div>
+              <div onClick={() => handleSort("zestaw")} className="column-head">Zest.<FontAwesomeIcon icon={faSortUp}/></div>
+              <div onClick={() => handleSort("rating")} className="column-head">Rat.<FontAwesomeIcon icon={faSortUp}/></div>
+
+              {/* <div className="column">Nr</div> 
+              <div className="column">Pytanie</div>
+              <div className="column">Kat.</div>
+              <div className="column">Zest.</div>
+              <div className="column">Rat.</div>*/}
+              {/*<div className="column">AI</div>
+              <div className="column">Law</div>*/}
+            </div>
+            
+            <ul>
+              {filteredQuestions.map((question, index) => (
+                <li
+                  key={question.id}
+                  className={`question-row ${{
+                    'P': 'highlight-p',
+                    'L': 'highlight-l',
+                    'PŻ': 'highlight-pz',
+                    'I': 'highlight-i'
+                  }[question.kategoria] || ''}`}
+                  onClick={() => handleQuestionClick(question.id)}
+                >
+                  <div className="column">{index + 1}</div>
+                  <div className="column">{question.number}</div>
+                  <div className="column">{question.question}</div>
+                  <div className="column">{question.kategoria}</div>
+                  <div className="column">{question.zestaw}</div>
+                  <div className={getRatingClass(question.rating)}>{question.rating}</div>
+                  {/*<div className="column">{question.aiAnswer}</div>
+                  <div className="column">{question.law}</div>*/}
+
+                  <div className="actions">
+                    <button onClick={(e) => handleEdit(question.id, e)} className="action-button">
+                      <FontAwesomeIcon icon={faEdit} />
+                    </button>
+                    <button onClick={(e) => handleDelete(question.id, e)} className="action-button">
+                      <FontAwesomeIcon icon={faTrashAlt} />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          {showConfirmPopup && (
+            <div className="confirm-popup">
+
             </div>
           )}
         </div>
-      </header>
-      <div className="filters">
-        <button onClick={() => document.getElementById('import-file').click()} className="import-button">Add CSV</button>
-        <input
-          type="file"
-          id="import-file"
-          accept=".csv"
-          onChange={(e) => handleImport(e.target.files[0])}
-          style={{ display: 'none' }}
-        />
-        <button onClick={handleLoadDefaultCSV} className="load-default-button">Load Default</button>
-        <button onClick={handleClearAll} className="clear-button">Clear All</button>
-        <button onClick={() => navigate('/UB2024-APP/add')} className="add-button">Add</button>
-
-        <button onClick={handleAuthClick} style={{ display: signedIn ? 'none' : 'block' }}>Sign In</button>
-        <button onClick={handleSignoutClick} style={{ display: signedIn ? 'block' : 'none' }}>Sign Out</button>
-        <button onClick={saveToCSV}>Save State</button>
-        <button onClick={() => autosave(questions, true)}>Autosave</button>
-        <label>
-          <input
-            type="checkbox"
-            checked={autosaveEnabled}
-            onChange={handleCheckboxChange}
-          />
-          Enable Autosave
-        </label>
-        
-        <button onClick={loadAutosaveAndReplace}>Load Autosave</button>
-        <button>
-        Current Autosave File: {currentAutosaveFilename}
-        </button>
-
-        <div className="sort-buttons">
-          {['number', 'kategoria', 'zestaw', 'rating'].map(property => (
-            <button key={property} onClick={() => handleSort(property)} className="filter-button">
-              Sort by: {property.charAt(0).toUpperCase() + property.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="filter-options">
-        <select onChange={(e) => handleFilter(e.target.value)} value={filterBy}>
-          <option value="">Show all</option>
-          {kategoriaOptions.map(kategoria => (
-            <option key={kategoria} value={kategoria}>{kategoria}</option>
-          ))}
-        </select>
-      </div>
-      <div className="question-container">
-        <div className="question-header">
-          <div className="column">lp</div>
-          <div className="column">Nr</div>
-          <div className="column">Pytanie</div>
-          <div className="column">Kat.</div>
-          <div className="column">Zest.</div>
-          <div className="column">Rat.</div>
-          {/*<div className="column">AI</div>
-          <div className="column">Law</div>*/}
-        </div>
-        <div className="question-info">
-          <p>Total Questions: {filteredQuestions.length}</p>
-        </div>
-        <ul>
-          {filteredQuestions.map((question, index) => (
-            <li
-              key={question.id}
-              className={`question-row ${{
-                'P': 'highlight-p',
-                'L': 'highlight-l',
-                'PŻ': 'highlight-pz',
-                'I': 'highlight-i'
-              }[question.kategoria] || ''}`}
-              onClick={() => handleQuestionClick(question.id)}
-            >
-              <div className="column">{index + 1}</div>
-              <div className="column">{question.number}</div>
-              <div className="column">{question.question}</div>
-              <div className="column">{question.kategoria}</div>
-              <div className="column">{question.zestaw}</div>
-              <div className={getRatingClass(question.rating)}>{question.rating}</div>
-              {/*<div className="column">{question.aiAnswer}</div>
-              <div className="column">{question.law}</div>*/}
-
-              <div className="actions">
-                <button onClick={(e) => handleEdit(question.id, e)} className="action-button">
-                  <FontAwesomeIcon icon={faEdit} />
-                </button>
-                <button onClick={(e) => handleDelete(question.id, e)} className="action-button">
-                  <FontAwesomeIcon icon={faTrashAlt} />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-      {showConfirmPopup && (
-        <div className="confirm-popup">
-
-        </div>
-      )}
     </div>
   );
 };
