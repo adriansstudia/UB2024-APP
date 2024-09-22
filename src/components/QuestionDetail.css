@@ -235,9 +235,10 @@
   justify-content: center;
   overflow-y: auto; /* Enables scrolling if content exceeds container size */
   overflow: hidden;  
+
 }
 
-.law-container-ed, .ai-answer-container-ed {
+.law-ap-container, .law-container-ed, .ai-answer-container-ed {
   position: fixed;
   bottom: -100%; /* Start off-screen */
   left: 10px;
@@ -257,9 +258,11 @@
 }
 .ai-answer-container-ed.revealed {
   bottom: 60px;
+
 }
 .law-container-ed.revealed {
   bottom: 60px;
+  z-index: 1000;
 }
 
 .ai-answer-container, .ai-answer-container-ed {
@@ -270,6 +273,21 @@
   height: 30%;
 }
 
+/* Show AI Answer (when revealed) */
+.law-container.revealed, .ai-answer-container.revealed {
+  bottom: 60px; /* Slide up to be visible */
+}
+
+.law-ap-container {
+  height: 50%;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.law-ap-container.revealed {
+  bottom: 360px; 
+}
+
+
 .ai-answer-editor {
   flex-grow: 1; /* Fills the remaining space in the container */
   width: 100%; /* Ensure it takes full width */
@@ -279,9 +297,23 @@
   text-align: justify; 
   overflow: hidden;
 }
+
+
+
+.law-link {
+  color: blue; /* Link color */
+  text-decoration: underline; /* Underline the link */
+  cursor: pointer; /* Change cursor on hover */
+}
+
+.law-link:hover {
+  color: darkblue; /* Change color on hover */
+}
+
+
 /* Specific styling for lists */
-.ai-answer-editor, .ql-editor ol, .ql-editor ul, .ql-editor li, .ql-editor {
-  padding-left: 0px; /* Adjust padding for lists */
+.law-container ul, .law-container li, .ai-answer-editor, .ql-editor ol, .ql-editor ul, .ql-editor li, .ql-editor {
+  padding-left: 00px; /* Adjust padding for lists */
   padding-bottom: 0px;
   padding-top: 0px;
   box-shadow: 0px 0px 0px 0px;
@@ -290,6 +322,16 @@
   font-size: 14px;
   line-height: 1.5;
 }
+
+.law-container{
+  text-align: justify;
+  display: block;
+  padding-left: 25px!important;
+  padding-right: 25px!important;
+  padding-top: 10px;
+}
+
+
 .ql-editor p{
   margin-bottom: 0.5em!important;
   padding-top: 0.5em!important;
@@ -316,10 +358,7 @@
   margin-bottom: 1em!important; /* Space after headers */
 }
 
-/* Show AI Answer (when revealed) */
-.law-container.revealed, .ai-answer-container.revealed {
-  bottom: 60px; /* Slide up to be visible */
-}
+
 
 .edit-ai-button{
   position: fixed;
@@ -461,3 +500,4 @@
     opacity: 1;
   }
 }
+

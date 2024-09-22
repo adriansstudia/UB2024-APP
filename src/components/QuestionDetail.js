@@ -29,8 +29,10 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
   const [aiAnswerContent, setAiAnswerContent] = useState('');
 
   const [isLawVisible, setIsLawVisible] = useState(false);
+  const [isAPVisible, setIsAPVisible] = useState(false);
   const [isLawEdited, setIsLawEdited] = useState(false);
   const [lawContent, setLawContent] = useState('');
+  const [APContent, setAPContent] = useState ('');
   const [isSaved, setIsSaved] = useState(false);
 
 
@@ -39,6 +41,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
   const [currentAutosaveFilename, setCurrentAutosaveFilename] = useState('');
   const [autosaveEnabled, setAutosaveEnabled] = useState(false); // State for checkbox
   const [autosaveInterval, setAutosaveInterval] = useState(null); // State for autosave interval
+
 
 
   const getFolderId = async (folderName) => {
@@ -61,61 +64,60 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
       console.error('Error getting or creating folder:', error);
     }
   };
-// Function to upload CSV to Google Drive
-const uploadCSVToDrive = async (blob, fileName) => {
-  try {
-    const folderId = await getFolderId('UB2024-APP');
+  // Function to upload CSV to Google Drive
+  const uploadCSVToDrive = async (blob, fileName) => {
+    try {
+      const folderId = await getFolderId('UB2024-APP');
+      const fileMetadata = {
+        name: fileName,
+        mimeType: 'text/csv',
+        parents: [folderId]
+      };
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
+      form.append('file', blob);
+      const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: new Headers({ 'Authorization': `Bearer ${window.gapi.client.getToken().access_token}` }),
+        body: form
+      });
+      removeOldestFiles();
+      if (!response.ok) throw new Error('Failed to upload autosave file');
+      // If upload was successful, return true
+      return true;
+    } catch (error) {
+      console.error('Error uploading autosave to Drive:', error);
+      // If there was an error, return false
+      return false;
+    }
+    
+  };
 
-    const fileMetadata = {
-      name: fileName,
-      mimeType: 'text/csv',
-      parents: [folderId]
-    };
 
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
-    form.append('file', blob);
 
-    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-      method: 'POST',
-      headers: new Headers({ 'Authorization': `Bearer ${window.gapi.client.getToken().access_token}` }),
-      body: form
+  const autosave = async () => {
+    const now = new Date();
+    now.setHours(now.getHours() + 2); // Adjust for UTC+2
+
+    const dateString = now.toISOString().replace(/T/, '___').replace(/:/g, '-').replace(/\.\d+Z$/, '');
+    const filename = `${BASE_FILENAME}${dateString}.csv`;
+
+    const csv = Papa.unparse(questions, {
+      header: true,
+      delimiter: ";",
+      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
     });
 
-    if (!response.ok) throw new Error('Failed to upload autosave file');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+    // Call uploadCSVToDrive and wait for the result
+    const isSaved = await uploadCSVToDrive(blob, filename);
     
-    // If upload was successful, return true
-    return true;
-  } catch (error) {
-    console.error('Error uploading autosave to Drive:', error);
-    // If there was an error, return false
-    return false;
-  }
-};
+    // Update the state based on whether the upload was successful
+    setIsSaved(isSaved); // Assuming you have a useState for isSaved
 
-const autosave = async () => {
-  const now = new Date();
-  now.setHours(now.getHours() + 2); // Adjust for UTC+2
-
-  const dateString = now.toISOString().replace(/T/, '___').replace(/:/g, '-').replace(/\.\d+Z$/, '');
-  const filename = `${BASE_FILENAME}${dateString}.csv`;
-
-  const csv = Papa.unparse(questions, {
-    header: true,
-    delimiter: ";",
-    columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
-  });
-
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-
-  // Call uploadCSVToDrive and wait for the result
-  const isSaved = await uploadCSVToDrive(blob, filename);
-  
-  // Update the state based on whether the upload was successful
-  setIsSaved(isSaved); // Assuming you have a useState for isSaved
-
-  setCurrentAutosaveFilename(filename); // Update filename display
-};
+    setCurrentAutosaveFilename(filename); // Update filename display
+  };
 
 
 
@@ -367,6 +369,7 @@ const autosave = async () => {
       setTimeout(() => navigate(`/UB2024-APP/question/${nextQuestion.id}`), 300);
       setIsLawEdited(false);
       setIsLawVisible(false);
+      setIsAPVisible(false);
       setIsAIAnswerEdited(false);
       setIsAIAnswerVisible(false);
     }
@@ -394,6 +397,7 @@ const autosave = async () => {
 
   const handleAiAnswerChange = (content) => setAiAnswerContent(content);
   const handleLawChange = (content) => setLawContent(content);
+  const handleAPChange = (content) => setAPContent(content);
 
   const handleRevealAIAnswer = () => setIsAIAnswerVisible(true);
   const handleHideAIAnswer = () => setIsAIAnswerVisible(false);
@@ -438,8 +442,24 @@ const autosave = async () => {
     }
   };
 
+  const toggleLawAP = (content) => {
+    setAPContent(content);
+    setIsAPVisible(!isAPVisible);
+  };
 
-  
+  // Function to create the HTML string with the link
+  const getLawContentWithLink = () => {
+    return lawContent.replace(
+      /Prawo budowlane/g, 
+      `<a href="#" class="law-link">Prawo Budowlane</a>`
+    );
+  };
+
+  // Handle the link click
+  const handleLawLinkClick = (e) => {
+    e.preventDefault();
+    toggleLawAP(`Content related to Prawo Budowlane`);
+  };
 
   return (
     <div className="question-detail-background">
@@ -456,6 +476,9 @@ const autosave = async () => {
         </div>
         <div className=""style={{ display: isSaved ? 'none' : 'block' }}>
           <button className="online-red" style={{ display: autosaveEnabled ? 'block' : 'none' }} onClick={stopAutosave} ><FontAwesomeIcon icon={faCircle} /></button>
+        </div>
+        <div className=""style={{ display: isSaved ? 'none' : 'block' }}>
+          <button className="online-red" style={{ display: autosaveEnabled ? 'none' : 'block' }} onClick={stopAutosave} ><FontAwesomeIcon icon={faCircle} /></button>
         </div>
 
         <FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={handleEditClick} />
@@ -482,7 +505,20 @@ const autosave = async () => {
               </button>
               <FontAwesomeIcon icon={faEdit} className="law-hide-button" onClick={handleAIAnswerEdit} />
             </>
+          )}          
+          {isAIAnswerEdited && (
+            <>
+              <button className="hide-button-ai" onClick={() => setIsAIAnswerEdited(false)}>
+                Hide AI
+              </button>
+              <button className="save-button-ai" onClick={handleSaveAIAnswer}>
+                <FontAwesomeIcon icon={faSave} />
+
+              </button>
+              <FontAwesomeIcon icon={faEdit} className="law-hide-button" onClick={handleAIAnswerHide} />
+            </>
           )}
+          
 
           {!isLawVisible && (
             <button className="law-button" onClick={handleRevealLaw}>
@@ -501,29 +537,6 @@ const autosave = async () => {
             </>
           )}
 
-
-          {isAnswerRevealed && (
-            <button className="hide-button" onClick={handleHideAnswer}>
-              Hide Answer
-            </button>
-          )}
-          <button onClick={handleRevealAnswer} className={`reveal-button ${isAnswerRevealed ? 'hidden' : ''}`}>
-            Reveal Answer
-          </button>
-
-          {isAIAnswerEdited && (
-            <>
-              <button className="hide-button-ai" onClick={() => setIsAIAnswerEdited(false)}>
-                Hide AI
-              </button>
-              <button className="save-button-ai" onClick={handleSaveAIAnswer}>
-                <FontAwesomeIcon icon={faSave} />
-
-              </button>
-              <FontAwesomeIcon icon={faEdit} className="law-hide-button" onClick={handleAIAnswerHide} />
-            </>
-          )}
-
           {isLawEdited && (
             <>
               <button className="law-hide-button" onClick={() => setIsLawEdited(false)}>
@@ -536,6 +549,18 @@ const autosave = async () => {
               <FontAwesomeIcon icon={faEdit} className="hide-button-ai" onClick={handleLawHide} />
             </>
           )}
+
+
+          {isAnswerRevealed && (
+            <button className="hide-button" onClick={handleHideAnswer}>
+              Hide Answer
+            </button>
+          )}
+          <button onClick={handleRevealAnswer} className={`reveal-button ${isAnswerRevealed ? 'hidden' : ''}`}>
+            Reveal Answer
+          </button>
+
+
           
 
       <div {...swipeHandlers} className={`question-detail ${getBackgroundClass(question.kategoria)} ${animationClass}`}>
@@ -591,7 +616,7 @@ const autosave = async () => {
           </div>
           
             
-          <div className={`law-container ${isLawVisible ? 'revealed' : ''}`}>
+          {/* <div className={`law-container ${isLawVisible ? 'revealed' : ''}`}>Akty Prawne / Normy / Opracowania:
             <ReactQuill 
               className="ai-answer-editor"
               theme="snow"
@@ -601,7 +626,7 @@ const autosave = async () => {
               readOnly= {true}    
             />
           </div>
-          <div className={`bottom-mask ${isLawVisible ? 'revealed' : ''}`}></div>
+          <div className={`bottom-mask ${isLawVisible ? 'revealed' : ''}`}></div>*/}
 
           <div className={`law-container-ed ${isLawEdited ? 'revealed' : ''}`}>
             <ReactQuill 
@@ -613,7 +638,38 @@ const autosave = async () => {
               readOnly= {false}    
             />
           </div>
-          <div className={`bottom-mask ${isLawEdited ? 'revealed' : ''}`}></div>
+          <div className={`bottom-mask ${isLawEdited ? 'revealed' : ''}`}></div> 
+
+
+          {/* <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}>
+            <ReactQuill 
+              className="ai-answer-editor"
+              theme="snow"
+              value={APContent}
+              onChange={handleAPChange}
+              modules={modulesHidden}
+              readOnly= {true}    
+            />
+          </div> */}
+          <div className={`law-container ${isLawVisible ? 'revealed' : ''}`}>
+          Akty Prawne / Normy / Opracowania:
+            <div 
+                dangerouslySetInnerHTML={{ __html: getLawContentWithLink() }} 
+                onClick={handleLawLinkClick} // Bind the click event here
+              />
+          </div>
+          <div className={`bottom-mask ${isLawVisible ? 'revealed' : ''}`}></div>
+
+          <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}>
+            <ReactQuill 
+              className="ai-answer-editor"
+              theme="snow"
+              value={APContent}
+              readOnly={true}    
+            />
+          </div>
+
+
         </div>
 
 
