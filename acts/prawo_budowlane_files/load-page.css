@@ -1,0 +1,38 @@
+.lex-start-loader {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    position: relative;
+    animation: loader10-start-app 1s ease alternate infinite;
+    animation-delay: 0.4s;
+    margin: 2.5rem auto 5rem;
+}
+
+.lex-start-loader::after,
+.lex-start-loader::before {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    animation: loader10-start-app 1s ease alternate infinite;
+}
+
+.lex-start-loader::before {
+    left: -36px;
+    animation-delay: 0.2s;
+}
+
+.lex-start-loader::after {
+    right: -36px;
+    animation-delay: 0.6s;
+}
+
+@keyframes loader10-start-app {
+    0% {
+        box-shadow: 0 24px 0 -24px #007ac3ff;
+    }
+    100% {
+        box-shadow: 0 24px 0 #007ac3ff;
+    }
+}

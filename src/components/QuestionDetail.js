@@ -3,11 +3,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './QuestionDetail.css'; // Import the CSS file
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit, faExpand, faSave, faCircle, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit, faExpand, faSave, faCircle, faUpload, faSearch, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import the Quill CSS
 import { useSwipeable } from 'react-swipeable';
 import Papa from 'papaparse';
+import Acts from './Acts'; // Import the Acts component
+
 
 
 const BASE_FILENAME = 'UB2024-APP_autosave_'; // Base filename for autosaves
@@ -41,8 +43,13 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
   const [currentAutosaveFilename, setCurrentAutosaveFilename] = useState('');
   const [autosaveEnabled, setAutosaveEnabled] = useState(false); // State for checkbox
   const [autosaveInterval, setAutosaveInterval] = useState(null); // State for autosave interval
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTermList, setSearchTermList] = useState('');
+  const [searchResults, setSearchResults] = useState([]);  // Array of search result positions
+  const [currentSearchIndex, setCurrentSearchIndex] = useState(-1);  // Index of the current match
 
 
+  const acts = Acts();
 
   const getFolderId = async (folderName) => {
     try {
@@ -408,6 +415,8 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
 
   const handleRevealLaw = () => setIsLawVisible(true);
   const handleHideLaw = () => setIsLawVisible(false);
+  
+
 
   const handleSaveAIAnswer = () => {
     if (question) {
@@ -442,24 +451,94 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
     }
   };
 
-  const toggleLawAP = (content) => {
-    setAPContent(content);
-    setIsAPVisible(!isAPVisible);
+  // Handler to select and display a specific act
+  const handleActClick = (actId) => {
+    const selectedAct = acts.find((act) => act.id === actId);
+    if (selectedAct) {
+      setAPContent(selectedAct.content);
+      setIsAPVisible(!isAPVisible);
+    }
+  };
+  // Handler for search input
+const handleSearchChange = (e) => setSearchTerm(e.target.value);
+  // Handler for search input
+const handleSearchChangeList = (e) => setSearchTermList(e.target.value);
+
+
+// Filtered acts based on search term
+const filteredActs = acts.filter((act) =>
+  act.title.toLowerCase().includes(searchTermList.toLowerCase())
+);
+
+const escapeSpecialCharacters = (text) => {
+  return text.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+};
+
+const searchInLaw = () => {
+  if (searchTerm) {
+    // Escape special characters before creating the regex
+    const escapedSearchTerm = escapeSpecialCharacters(searchTerm);
+
+    const regex = new RegExp(escapedSearchTerm, 'gi');  // g: global, i: case-insensitive
+    const matches = [...APContent.matchAll(regex)];
+
+    setSearchResults(matches.map(match => match.index));
+    setCurrentSearchIndex(matches.length > 0 ? 0 : -1);
+    scrollToMatch(0); // Scroll to the first match after searching
+  }
+};
+
+  // Function to go to the next instance of the search term
+  const goToNextMatch = () => {
+    if (searchResults.length > 0) {
+      const nextIndex = (currentSearchIndex + 1) % searchResults.length;
+      setCurrentSearchIndex(nextIndex);
+      scrollToMatch(nextIndex);
+    }
   };
 
-  // Function to create the HTML string with the link
-  const getLawContentWithLink = () => {
-    return lawContent.replace(
-      /Prawo budowlane/g, 
-      `<a href="#" class="law-link">Prawo Budowlane</a>`
-    );
+  // Function to go to the previous instance of the search term
+  const goToPreviousMatch = () => {
+    if (searchResults.length > 0) {
+      const prevIndex = (currentSearchIndex - 1 + searchResults.length) % searchResults.length;
+      setCurrentSearchIndex(prevIndex);
+      scrollToMatch(prevIndex);
+    }
   };
 
-  // Handle the link click
-  const handleLawLinkClick = (e) => {
-    e.preventDefault();
-    toggleLawAP(`Content related to Prawo Budowlane`);
+  const scrollToMatch = (index) => {
+    const matchIndex = searchResults[index];
+    if (matchIndex !== undefined) {
+      // Find the specific highlighted match element by its class or id
+      const highlightedElements = document.querySelectorAll('.highlight, .highlight-current');
+      const currentElement = highlightedElements[index];
+  
+      if (currentElement) {
+        // Scroll the container to bring the current match into view
+        currentElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'  // Ensure the match appears in the middle of the container
+        });
+      }
+    }
   };
+
+
+  const getHighlightedLawContent = () => {
+    if (searchTerm) {
+      // Escape special characters for the search term
+      const escapedSearchTerm = escapeSpecialCharacters(searchTerm);
+
+      const regex = new RegExp(escapedSearchTerm, 'gi');
+      let counter = -1;
+      return APContent.replace(regex, (match) => {
+        counter++;
+        return `<span class="${counter === currentSearchIndex ? 'highlight-current' : 'highlight'}" id="match-${counter}">${match}</span>`;
+      });
+    }
+    return APContent;
+  };
+
 
   return (
     <div className="question-detail-background">
@@ -652,21 +731,50 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
             />
           </div> */}
           <div className={`law-container ${isLawVisible ? 'revealed' : ''}`}>
-          Akty Prawne / Normy / Opracowania:
-            <div 
-                dangerouslySetInnerHTML={{ __html: getLawContentWithLink() }} 
-                onClick={handleLawLinkClick} // Bind the click event here
-              />
+            <h4>Available Legal Acts:</h4>
+            <input
+              type="text"
+              placeholder="Search acts..."
+              value={searchTermList}
+              onChange={handleSearchChangeList}
+            />
+            <ul >
+              {filteredActs.map((act) => (
+                <li key={act.id}>
+                  <button onClick={() => handleActClick(act.id)}>{act.title}</button>
+                </li>
+              ))}
+            </ul>
+            <div dangerouslySetInnerHTML={{ __html: lawContent }} />
+            
           </div>
           <div className={`bottom-mask ${isLawVisible ? 'revealed' : ''}`}></div>
 
+          {/* Law AP Container */}
           <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}>
-            <ReactQuill 
-              className="ai-answer-editor"
-              theme="snow"
-              value={APContent}
-              readOnly={true}    
-            />
+            
+            <div className="search-section">
+              <input
+                type="text"
+                value={searchTerm}
+                placeholder="Search in legal act..."
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button onClick={searchInLaw}>
+                <FontAwesomeIcon icon={faSearch} />
+              </button>
+              <button onClick={goToPreviousMatch}>
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </button>
+              <button onClick={goToNextMatch}>
+                <FontAwesomeIcon icon={faArrowRight} />
+              </button>
+            </div>
+            {/* Display the law content with highlighted matches */}
+            <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}dangerouslySetInnerHTML={{ __html: getHighlightedLawContent() }} />
+
+            
+
           </div>
 
 

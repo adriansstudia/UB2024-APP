@@ -1,0 +1,62 @@
+window['trialAccess'] = {};
+
+// subscribeSystemJS
+window['trialAccess']['js'] = document.createElement('script');
+window['trialAccess']['js']['async'] = true;
+window['trialAccess']['js']['src'] = window['wkVars']['frontend']['subscribeSubSystemJS'] || '';
+if (window['trialAccess']['js']['src'] !== '') {
+    document.body.appendChild(window['trialAccess']['js']);
+}
+
+window['WkOrderTrial'] = function (docUrl, idUTM) {
+    idUTM = '' + idUTM;
+    window['trialAccess']['trialAccessSandbox'] = document.querySelector('TrialAccessOrderWizzard-Goes-Here');
+    if (!docUrl) {
+        var docUrl = window && window.loginUrl ? window.loginUrl : window.location.href;
+    }
+
+    if (window && window['WkTrialAccess']) {
+        var cfgUTM =
+            window['wkVars'] && window['wkVars']['frontend'] && window['wkVars']['frontend']['click2LexUTMs']
+                ? window['wkVars']['frontend']['click2LexUTMs']
+                : {};
+        var productID =
+            window['wkVars'] && window['wkVars']['frontend'] && window['wkVars']['frontend']['click2LexProductID']
+                ? window['wkVars']['frontend']['click2LexProductID']
+                : undefined;
+        var defaultUTM = {
+            utm_source: 'OpenLEX - Demo',
+            utm_medium: 'test-medium',
+            utm_campaign: 'test-campaign',
+            utm_content: 'test-content',
+            utm_term: 'test-term',
+            form_url: docUrl,
+            findUTM: idUTM,
+        };
+
+        var findUTM = find(cfgUTM, { utm_id: idUTM });
+        var utms = findUTM ? Object.assign({}, findUTM, { form_url: docUrl }) : defaultUTM;
+        new WkTrialAccess.Order(
+            window['trialAccess']['trialAccessSandbox'],
+            {
+                documentUrl: docUrl,
+                sessionId: null,
+                productId: productID,
+            },
+            utms,
+        );
+    } else {
+        if (window && window.translate && window.translate.instant) {
+            if (
+                window.translate.instant('TECHNICAL_PROBLEM.CLICK2LEX_INACTIVE') &&
+                window.translate.instant('TECHNICAL_PROBLEM.CLICK2LEX_INACTIVE') !== 'TECHNICAL_PROBLEM.CLICK2LEX_INACTIVE'
+            ) {
+                alert(window.translate.instant('TECHNICAL_PROBLEM.CLICK2LEX_INACTIVE'));
+            } else {
+                alert('Zamawianie dostępu testowego jest chwilowo nieaktywne, spróbuj później .....');
+            }
+        } else {
+            alert('Zamawianie dostępu testowego jest chwilowo nieaktywne, spróbuj później .....');
+        }
+    }
+};
