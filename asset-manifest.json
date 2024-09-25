@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/UB2024-APP/static/css/main.b1795952.css",
-    "main.js": "/UB2024-APP/static/js/main.97e6ea4c.js",
+    "main.css": "/UB2024-APP/static/css/main.94f0b48c.css",
+    "main.js": "/UB2024-APP/static/js/main.1e2eb478.js",
     "static/media/background1.png": "/UB2024-APP/static/media/background1.d52698845361e8f8291a.png",
     "static/media/fa-solid-900.ttf": "/UB2024-APP/static/media/fa-solid-900.07ed6d5fa32c1d54af0f.ttf",
     "static/media/fa-brands-400.ttf": "/UB2024-APP/static/media/fa-brands-400.0ff70dcbf135d859ebf3.ttf",
@@ -16,11 +16,11 @@
     "static/media/slick.ttf": "/UB2024-APP/static/media/slick.c94f7671dcc99dce43e2.ttf",
     "static/media/slick.woff": "/UB2024-APP/static/media/slick.295183786cd8a1389865.woff",
     "index.html": "/UB2024-APP/index.html",
-    "main.b1795952.css.map": "/UB2024-APP/static/css/main.b1795952.css.map",
-    "main.97e6ea4c.js.map": "/UB2024-APP/static/js/main.97e6ea4c.js.map"
+    "main.94f0b48c.css.map": "/UB2024-APP/static/css/main.94f0b48c.css.map",
+    "main.1e2eb478.js.map": "/UB2024-APP/static/js/main.1e2eb478.js.map"
   },
   "entrypoints": [
-    "static/css/main.b1795952.css",
-    "static/js/main.97e6ea4c.js"
+    "static/css/main.94f0b48c.css",
+    "static/js/main.1e2eb478.js"
   ]
 }
