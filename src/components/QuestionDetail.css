@@ -143,7 +143,7 @@
 
 /* Buttons */
 
-.law-hide-button, .law-button, .save-button-ai, .reveal-button, .hide-button, .ai-answer-button, .hide-button-ai {
+.law-list-button, .law-hide-button, .law-button, .save-button-ai, .reveal-button, .hide-button, .ai-answer-button, .hide-button-ai {
   position: fixed;
   bottom: 20px;
   left: 50%;
@@ -160,10 +160,21 @@
 
 .reveal-button.hidden, .hide-button.hidden, .hide-button-ai.hidden { display: none; }
 
-.reveal-button:hover, .hide-button:hover, .ai-answer-button:hover, .hide-button-ai:hover {
+.law-list-button:hover, .reveal-button:hover, .hide-button:hover, .ai-answer-button:hover, .hide-button-ai:hover {
  
   font-weight: 600;
   color: white;
+}
+
+.law-list-button{
+  position: fixed;
+  width: 10%;
+  left: 90%;
+  text-align: center;
+  bottom: 28.5%;
+  z-index: 1500;
+  color: #ffffff;
+  background-color: #242424;
 }
 
 /* AI Answer Button */
@@ -217,7 +228,7 @@
 }
 
 /* AI Answer Container */
-.law-ap-container, .law-container, .ai-answer-container {
+.law-list-container, .law-ap-container, .law-container, .ai-answer-container {
   position: fixed;
   bottom: -100%; /* Start off-screen */
   left: 10px;
@@ -270,7 +281,7 @@
 }
 
 .law-container, .law-container-ed {
-  height: 30%;
+  height: 20%;
 }
 
 /* Show AI Answer (when revealed) */
@@ -279,14 +290,17 @@
 }
 
 .law-ap-container {
-  height: 50%;
+  height: 60%;
   background: rgba(255, 255, 255, 0.9);
 }
 
 .law-ap-container.revealed {
-  bottom: 360px; 
+  bottom: 28%; 
 }
-
+.html-tag {
+  color: grey; /* Change this color to your desired shade of grey */
+  font-family: monospace; /* Optional: use a monospace font for a code-like appearance */
+}
 
 .ai-answer-editor {
   flex-grow: 1; /* Fills the remaining space in the container */
@@ -311,7 +325,7 @@
 
 
 /* Specific styling for lists */
-.law-container ul, .law-container li, .ai-answer-editor, .ql-editor ol, .ql-editor ul, .ql-editor li, .ql-editor {
+.law-list-container ul, .law-list-container li, .law-list-container ol, .law-container ul, .law-container li, .ai-answer-editor, .ql-editor ol, .ql-editor ul, .ql-editor li, .ql-editor {
   padding-left: 00px; /* Adjust padding for lists */
   padding-bottom: 0px;
   padding-top: 0px;
@@ -322,7 +336,7 @@
   line-height: 1.5;
 }
 
-.law-ap-container, .law-container{
+.law-list-container, .law-ap-container, .law-container{
   text-align: justify;
   display: block;
   padding-left: 25px!important;
@@ -331,7 +345,15 @@
   overflow-y: auto; /* Enables vertical scrolling */
   font-size: 10px;
 }
+.law-list-container{
 
+  height: 10%;
+
+}
+.law-list-container.revealed{
+  bottom: 28%; 
+  z-index: 200;
+}
 
 input {
   margin-bottom: 10px; /* Add space between the input and the list */
@@ -478,6 +500,16 @@ input {
 
 .close-popup:hover { color: red; }
 
+.law-AP-close{
+  position: fixed;
+  bottom: 86%;
+  left: 90%;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1000;
+}
 
 
 .slide-left {
@@ -529,8 +561,12 @@ input {
 .search-section input {
   width: 200px;
   padding: 5px;
+
   margin-right: 10px;
 }
 
+.search-bar{
 
+  width: 100%;
+}
 

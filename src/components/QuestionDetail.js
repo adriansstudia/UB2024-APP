@@ -9,6 +9,8 @@ import 'react-quill/dist/quill.snow.css'; // Import the Quill CSS
 import { useSwipeable } from 'react-swipeable';
 import Papa from 'papaparse';
 import Acts from './Acts'; // Import the Acts component
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github.css'; // Choose a style you like
 
 
 
@@ -31,6 +33,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
   const [aiAnswerContent, setAiAnswerContent] = useState('');
 
   const [isLawVisible, setIsLawVisible] = useState(false);
+  const [isLawListVisible, setIsLawListVisible] = useState(false);
   const [isAPVisible, setIsAPVisible] = useState(false);
   const [isLawEdited, setIsLawEdited] = useState(false);
   const [lawContent, setLawContent] = useState('');
@@ -50,7 +53,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
 
 
   const acts = Acts();
-
+  
   const getFolderId = async (folderName) => {
     try {
       const response = await window.gapi.client.drive.files.list({
@@ -414,8 +417,9 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
   const handleLawHide = () => setIsLawEdited(false);
 
   const handleRevealLaw = () => setIsLawVisible(true);
+  const handleRevealLawList = () => setIsLawListVisible(!isLawListVisible);
   const handleHideLaw = () => setIsLawVisible(false);
-  
+
 
 
   const handleSaveAIAnswer = () => {
@@ -456,14 +460,14 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
     const selectedAct = acts.find((act) => act.id === actId);
     if (selectedAct) {
       setAPContent(selectedAct.content);
-      setIsAPVisible(!isAPVisible);
+      setIsAPVisible(true);
+      setIsLawListVisible(false);
     }
   };
   // Handler for search input
 const handleSearchChange = (e) => setSearchTerm(e.target.value);
   // Handler for search input
 const handleSearchChangeList = (e) => setSearchTermList(e.target.value);
-
 
 // Filtered acts based on search term
 const filteredActs = acts.filter((act) =>
@@ -474,17 +478,23 @@ const escapeSpecialCharacters = (text) => {
   return text.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 };
 
+
 const searchInLaw = () => {
   if (searchTerm) {
     // Escape special characters before creating the regex
     const escapedSearchTerm = escapeSpecialCharacters(searchTerm);
+    console.log(`Escaped Search Term: ${escapedSearchTerm}`); // Debugging
 
-    const regex = new RegExp(escapedSearchTerm, 'gi');  // g: global, i: case-insensitive
+    // Create a regex from the escaped search term
+    const regex = new RegExp(escapedSearchTerm, 'gi'); // g: global, i: case-insensitive
     const matches = [...APContent.matchAll(regex)];
+    
+    console.log(`Matches found: ${matches.map(m => m[0])}`); // Debugging
 
+    // Store the indices of the matches
     setSearchResults(matches.map(match => match.index));
     setCurrentSearchIndex(matches.length > 0 ? 0 : -1);
-    scrollToMatch(0); // Scroll to the first match after searching
+    scrollToMatch(0); // Scroll to the first match
   }
 };
 
@@ -523,22 +533,33 @@ const searchInLaw = () => {
     }
   };
 
-
-  const getHighlightedLawContent = () => {
-    if (searchTerm) {
-      // Escape special characters for the search term
-      const escapedSearchTerm = escapeSpecialCharacters(searchTerm);
-
-      const regex = new RegExp(escapedSearchTerm, 'gi');
-      let counter = -1;
-      return APContent.replace(regex, (match) => {
-        counter++;
-        return `<span class="${counter === currentSearchIndex ? 'highlight-current' : 'highlight'}" id="match-${counter}">${match}</span>`;
-      });
-    }
-    return APContent;
+  const replaceClassAttributes = (htmlContent) => {
+    // This regex matches class attributes in the format class="..."
+    const regex = /class="[^"]*"/g;
+  
+    // Replace all matched class attributes with an empty string
+    return htmlContent.replace(regex, '');
   };
 
+const getHighlightedLawContent = () => {
+  // Remove all class attributes (e.g., class="...") from APContent
+  const cleanedContent = APContent.replace(/class="[^"]*"/g, '');
+
+  if (searchTerm) {
+    // Escape special characters for the search term
+    const escapedSearchTerm = escapeSpecialCharacters(searchTerm);
+    console.log(`Escaped Search Term in Highlighting: ${escapedSearchTerm}`); // Debugging
+
+    const regex = new RegExp(escapedSearchTerm, 'gi');
+    let counter = -1;
+
+    return cleanedContent.replace(regex, (match) => {
+      counter++;
+      return `<span class="${counter === currentSearchIndex ? 'highlight-current' : 'highlight'}">${match}</span>`;
+    });
+  }
+  return cleanedContent; // Return unmodified content if no search term
+};
 
   return (
     <div className="question-detail-background">
@@ -606,6 +627,10 @@ const searchInLaw = () => {
           )}
           {isLawVisible && (
             <>
+              {/* <button className='save-button-ai' onClick={setIsLawListVisible(true)}></button> */}
+              <button className="law-list-button" onClick={handleRevealLawList}>
+                AP
+              </button>
               <button className="law-hide-button" onClick={() => setIsLawVisible(false)}>
                 Hide Law
               </button>
@@ -615,6 +640,16 @@ const searchInLaw = () => {
               <FontAwesomeIcon icon={faEdit} className="hide-button-ai" onClick={handleLawEdit} />
             </>
           )}
+          {isAPVisible && (
+            
+            <>
+              <div className="">
+                <button className="law-AP-close" onClick={() => setIsAPVisible(false)}><FontAwesomeIcon icon={faTimes} /></button>
+              </div>
+            </>
+            
+          )}
+
 
           {isLawEdited && (
             <>
@@ -731,52 +766,57 @@ const searchInLaw = () => {
             />
           </div> */}
           <div className={`law-container ${isLawVisible ? 'revealed' : ''}`}>
-            <h4>Available Legal Acts:</h4>
-            <input
-              type="text"
-              placeholder="Search acts..."
-              value={searchTermList}
-              onChange={handleSearchChangeList}
-            />
-            <ul >
-              {filteredActs.map((act) => (
-                <li key={act.id}>
-                  <button onClick={() => handleActClick(act.id)}>{act.title}</button>
-                </li>
-              ))}
-            </ul>
+            <div className={`law-list-container ${isLawListVisible ? 'revealed' : ''}`}>
+                <input
+                  className='search-bar'
+                  type="text"
+                  placeholder="Search acts..."
+                  value={searchTermList}
+                  onChange={handleSearchChangeList}
+                />
+                <ul >
+                {filteredActs.map((act) => (
+                  <li key={act.id}>
+                    <button onClick={() => handleActClick(act.id)}>{act.title}</button>
+                  </li>
+                ))}
+              </ul>
+              
+            </div>
+            <h4>instrukcja: WT: id="par(13)ust(1)pkt(1)lit(b)"_  PB: id="art(2)ust(2)pkt(1)lit(b)"</h4>
+
             <div dangerouslySetInnerHTML={{ __html: lawContent }} />
             
+
+
+            {/* Law AP Container */}
+            <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}>
+              
+              <div className="search-section">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  placeholder="Search in legal act..."
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button onClick={searchInLaw}>
+                  <FontAwesomeIcon icon={faSearch} />
+                </button>
+                <button onClick={goToPreviousMatch}>
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
+                <button onClick={goToNextMatch}>
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </button>
+              </div>
+              {/* Display the law content with highlighted matches */}
+              <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}dangerouslySetInnerHTML={{ __html: getHighlightedLawContent() }} />
+
+              
+
+            </div>
           </div>
           <div className={`bottom-mask ${isLawVisible ? 'revealed' : ''}`}></div>
-
-          {/* Law AP Container */}
-          <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}>
-            
-            <div className="search-section">
-              <input
-                type="text"
-                value={searchTerm}
-                placeholder="Search in legal act..."
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <button onClick={searchInLaw}>
-                <FontAwesomeIcon icon={faSearch} />
-              </button>
-              <button onClick={goToPreviousMatch}>
-                <FontAwesomeIcon icon={faArrowLeft} />
-              </button>
-              <button onClick={goToNextMatch}>
-                <FontAwesomeIcon icon={faArrowRight} />
-              </button>
-            </div>
-            {/* Display the law content with highlighted matches */}
-            <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}dangerouslySetInnerHTML={{ __html: getHighlightedLawContent() }} />
-
-            
-
-          </div>
-
 
         </div>
 
