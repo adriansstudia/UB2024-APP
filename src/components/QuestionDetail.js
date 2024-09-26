@@ -9,8 +9,6 @@ import 'react-quill/dist/quill.snow.css'; // Import the Quill CSS
 import { useSwipeable } from 'react-swipeable';
 import Papa from 'papaparse';
 import Acts from './Acts'; // Import the Acts component
-import hljs from 'highlight.js';
-import 'highlight.js/styles/github.css'; // Choose a style you like
 
 
 
@@ -50,10 +48,60 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
   const [searchTermList, setSearchTermList] = useState('');
   const [searchResults, setSearchResults] = useState([]);  // Array of search result positions
   const [currentSearchIndex, setCurrentSearchIndex] = useState(-1);  // Index of the current match
-
+  const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState(null); // Store recognition instance
+  const [transcript, setTranscript] = useState('');
+  const [lastFinalResult, setLastFinalResult] = useState(''); // Track the last final result
 
   const acts = Acts();
-  
+
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return; // Exit if not supported
+
+    const recog = new SpeechRecognition();
+    recog.interimResults = true;
+    recog.continuous = true; // Allow continuous speech recognition
+    recog.lang = 'pl-PL'; // Set to Polish, or change as needed
+
+    recog.onresult = (event) => {
+      // Process both interim and final results
+      const results = Array.from(event.results);
+      const finalResults = results
+        .filter(result => result.isFinal) // Filter for final results only
+        .map(result => result[0].transcript)
+        .join(' '); // Join final results into a single string
+
+      if (finalResults && finalResults !== lastFinalResult) {
+        setAiAnswerContent((prevContent) => `${prevContent} ${finalResults}`); // Append final transcript to the editor
+        setLastFinalResult(finalResults); // Update last final result to current
+      }
+    };
+
+    recog.onend = () => {
+      if (isListening) {
+        recog.start(); // Restart if still listening
+      }
+    };
+
+    setRecognition(recog); // Store recognition instance
+
+    // Clean up function to stop recognition
+    return () => {
+      recog.stop();
+    };
+  }, [isListening, lastFinalResult]);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognition.stop(); // Stop recognition explicitly
+    } else {
+      recognition.start(); // Start recognition if not listening
+    }
+    setIsListening((prev) => !prev);
+  };
+
   const getFolderId = async (folderName) => {
     try {
       const response = await window.gapi.client.drive.files.list({
@@ -442,6 +490,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
       [{ 'color': [] }, { 'background': [] }],   // Text color and background color
       [{ 'align': [] }],                         // Align text (left, center, right, justify)
       ['link', 'image'],                         // Insert link and image
+      ['speech'], // Add custom button for speech recognition
     ],
     clipboard: {
       matchVisual: false // Prevent weird styles from pasting content
@@ -533,17 +582,23 @@ const searchInLaw = () => {
     }
   };
 
-  const replaceClassAttributes = (htmlContent) => {
-    // This regex matches class attributes in the format class="..."
-    const regex = /class="[^"]*"/g;
-  
-    // Replace all matched class attributes with an empty string
-    return htmlContent.replace(regex, '');
-  };
 
 const getHighlightedLawContent = () => {
   // Remove all class attributes (e.g., class="...") from APContent
-  const cleanedContent = APContent.replace(/class="[^"]*"/g, '');
+  const cleanedContent = APContent
+  .replace(/class="[^"]*"/g, '')
+  .replace(/href="[^"]*"/g, '') // Remove href attributes
+  .replace(/<a/g, '<strong')       // Replace <a with <strong
+  .replace(/<\/a>/g, '</strong>')  // Replace </a> with </strong>
+  .replace(/<span/g, '<span style="color: black;"') 
+  // .replace(/<div id="/g, '<div style="color: green;"') 
+
+  .replace(/([a-zA-Z0-9]+)\.&nbsp;/g, '<strong>$1.&nbsp;</strong>') // Replace any letter or number followed by .&nbsp; with <strong>
+  .replace(/([a-zA-Z0-9]+)\)\s*<\/div>/g, '<strong>$1)</strong></div>')
+
+  .replace(/data-unit-id="[^"]*"/g, '')
+  // .replace(/<div\s+id="([^"]+)"\s*[^>]*>/g, '<div><small style="color:grey;" id="$1"></small>')
+
 
   if (searchTerm) {
     // Escape special characters for the search term
@@ -560,6 +615,8 @@ const getHighlightedLawContent = () => {
   }
   return cleanedContent; // Return unmodified content if no search term
 };
+
+
 
   return (
     <div className="question-detail-background">
@@ -726,6 +783,10 @@ const getHighlightedLawContent = () => {
               modules={modules}
               readOnly= {false}    
             />
+            <button onClick={toggleListening}>
+              {isListening ? 'Stop Listening' : 'Start Listening'}
+            </button>
+            <p>Transcript: {transcript}</p> 
             
           </div>
           
