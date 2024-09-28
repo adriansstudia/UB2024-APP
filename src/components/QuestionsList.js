@@ -124,6 +124,10 @@ const QuestionsList = ({
             // Parse number properties as integers for numeric sorting
             return (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0);
           }
+          // if (sortBy === 'numberP') {
+          //   // Parse number properties as integers for numeric sorting
+          //   return (parseInt(a.numberP, 10) || 0) - (parseInt(b.numberP, 10) || 0);
+          // }
           if (sortBy === 'zestaw') {
             // Custom sorting for Zestaw in the format D_Z1, where D_Z is sorted as text and 1 as number
             const parseZestaw = (zestaw) => {
@@ -193,6 +197,7 @@ const QuestionsList = ({
         const importedQuestions = result.data.map(row => ({
           id: uuidv4(),
           number: row['number'] || '',
+          numberP:row['numberP'] || '',
           question: row['question'] || '',
           kategoria: row['kategoria'] || '',
           zestaw: row['zestaw'] || '',
@@ -215,6 +220,7 @@ const QuestionsList = ({
         const importedQuestions = result.data.map(row => ({
           id: uuidv4(),
           number: row['number'] || '',
+          numberP:row['numberP'] || '',
           question: row['question'] || '',
           kategoria: row['kategoria'] || '',
           zestaw: row['zestaw'] || '',
@@ -364,7 +370,7 @@ const QuestionsList = ({
     const csv = Papa.unparse(questions, {
       header: true,
       delimiter: ";",
-      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
+      columns: ["number", "numberP", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -430,7 +436,7 @@ const QuestionsList = ({
     const csv = Papa.unparse(questions, {
       header: true,
       delimiter: ";",
-      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
+      columns: ["number", "numberP", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
     });
   
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -687,6 +693,8 @@ const QuestionsList = ({
               <div className="column-head">lp</div>
               <div onClick={() => handleSort("number")} className="column-head">Nr<FontAwesomeIcon icon={faSortUp}/></div>
               <div className="column-head">Pytanie</div>
+              <div onClick={() => handleSort("numberP")} className="column-head">P<FontAwesomeIcon icon={faSortUp}/></div>
+              
               <div onClick={() => handleSort("kategoria")} className="column-head">Kat.<FontAwesomeIcon icon={faSortUp}/></div>
               <div onClick={() => handleSort("zestaw")} className="column-head">Zest.<FontAwesomeIcon icon={faSortUp}/></div>
               <div onClick={() => handleSort("rating")} className="column-head">Rat.<FontAwesomeIcon icon={faSortUp}/></div>
@@ -714,10 +722,13 @@ const QuestionsList = ({
                 >
                   <div className="column">{index + 1}</div>
                   <div className="column">{question.number}</div>
+                  
                   <div className="column">{question.question}</div>
+                  <div className="column">{question.numberP}</div>
                   <div className="column">{question.kategoria}</div>
                   <div className="column">{question.zestaw}</div>
                   <div className={getRatingClass(question.rating)}>{question.rating}</div>
+
                   {/*<div className="column">{question.aiAnswer}</div>
                   <div className="column">{question.law}</div>*/}
 

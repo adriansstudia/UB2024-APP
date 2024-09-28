@@ -14,13 +14,17 @@ import Acts from './Acts'; // Import the Acts component
 
 const BASE_FILENAME = 'UB2024-APP_autosave_'; // Base filename for autosaves
 
-const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAnswer, updateLaw}) => {
+const QuestionDetail = ({ questions, updatePodobne, updateRating, sortBy, filterBy, updateAIAnswer, updateLaw}) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
   const [showRatingPopup, setShowRatingPopup] = useState(false);
   const [rating, setRating] = useState(1);
+
+  const [showPodobnePopup, setShowPodobnePopup] = useState(false);
+  const [numberP, setNumberP] = useState(1);
+
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [question, setQuestion] = useState(null);
   const [sortedAndFilteredQuestions, setSortedAndFilteredQuestions] = useState([]);
@@ -56,51 +60,6 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
   const acts = Acts();
 
 
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return; // Exit if not supported
-
-    const recog = new SpeechRecognition();
-    recog.interimResults = true;
-    recog.continuous = true; // Allow continuous speech recognition
-    recog.lang = 'pl-PL'; // Set to Polish, or change as needed
-
-    recog.onresult = (event) => {
-      // Process both interim and final results
-      const results = Array.from(event.results);
-      const finalResults = results
-        .filter(result => result.isFinal) // Filter for final results only
-        .map(result => result[0].transcript)
-        .join(' '); // Join final results into a single string
-
-      if (finalResults && finalResults !== lastFinalResult) {
-        setAiAnswerContent((prevContent) => `${prevContent} ${finalResults}`); // Append final transcript to the editor
-        setLastFinalResult(finalResults); // Update last final result to current
-      }
-    };
-
-    recog.onend = () => {
-      if (isListening) {
-        recog.start(); // Restart if still listening
-      }
-    };
-
-    setRecognition(recog); // Store recognition instance
-
-    // Clean up function to stop recognition
-    return () => {
-      recog.stop();
-    };
-  }, [isListening, lastFinalResult]);
-
-  const toggleListening = () => {
-    if (isListening) {
-      recognition.stop(); // Stop recognition explicitly
-    } else {
-      recognition.start(); // Start recognition if not listening
-    }
-    setIsListening((prev) => !prev);
-  };
 
   const getFolderId = async (folderName) => {
     try {
@@ -163,7 +122,7 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
     const csv = Papa.unparse(questions, {
       header: true,
       delimiter: ";",
-      columns: ["number", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
+      columns: ["number", "numberP", "question", "kategoria", "zestaw", "rating", "answer", "aiAnswer", "law"]
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -339,6 +298,9 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
         if (sortBy === 'number') {
           return (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0);
         }
+        // if (sortBy === 'numberP') {
+        //   return (parseInt(a.numberP, 10) || 0) - (parseInt(b.numberP, 10) || 0);
+        // }
 
         if (sortBy === 'zestaw') {
           const parseZestaw = zestaw => {
@@ -373,6 +335,8 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
       setLawContent(foundQuestion['law'] || '');
       setIsAnswerRevealed(false);
       setRating(foundQuestion && !isNaN(parseInt(foundQuestion.rating, 10)) ? parseInt(foundQuestion.rating, 10) : '');
+      setNumberP(foundQuestion && foundQuestion.numberP !== undefined ? foundQuestion.numberP : '');
+
     }
   }, [id, questions, sortBy, filterBy]);
 
@@ -407,6 +371,22 @@ const QuestionDetail = ({ questions, updateRating, sortBy, filterBy, updateAIAns
 
   const handleRevealAnswer = () => setIsAnswerRevealed(true);
   const handleHideAnswer = () => setIsAnswerRevealed(false);
+
+  const handlePodobneNr = () => setShowPodobnePopup(true);
+  const handlePodobne = (value) => {
+    setNumberP(value);
+    updatePodobne(question.id, value);
+    setShowPodobnePopup(false);
+  };
+
+  const handleClosePodobnePopup = () => setShowPodobnePopup(false);
+  // Function to handle the "Enter" key press
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handlePodobne(numberP); // Call the handlePodobne function with the current value
+    }
+  };
+  
 
   const handleRate = () => setShowRatingPopup(true);
   const handleRating = (value) => {
@@ -737,7 +717,8 @@ const getHighlightedLawContent = () => {
       <div {...swipeHandlers} className={`question-detail ${getBackgroundClass(question.kategoria)} ${animationClass}`}>
         
         <div className="question-header2">
-          <p><strong>Number:</strong> {question.number}</p>
+          <p><strong>Nr:</strong> {question.number}</p>
+          <p onClick={handlePodobneNr}><strong>P:</strong> {numberP} </p>
           <p><strong>Kategoria:</strong> {question.kategoria}</p>
           <p><strong>Zestaw:</strong> {question.zestaw}</p>
           <p>
@@ -774,7 +755,7 @@ const getHighlightedLawContent = () => {
           <div className={`bottom-mask ${isAIAnswerVisible ? 'revealed' : ''}`}></div>
 
 
-          <div className={`ai-answer-container-ed ${isAIAnswerEdited ? 'revealed' : ''}`}>
+          {/* <div className={`ai-answer-container-ed ${isAIAnswerEdited ? 'revealed' : ''}`}>
             <ReactQuill 
               className="ai-answer-editor"
               theme="snow"
@@ -788,7 +769,7 @@ const getHighlightedLawContent = () => {
             </button>
             <p>Transcript: {transcript}</p> 
             
-          </div>
+          </div> */}
           
             
           {/* <div className={`law-container ${isLawVisible ? 'revealed' : ''}`}>Akty Prawne / Normy / Opracowania:
@@ -895,6 +876,27 @@ const getHighlightedLawContent = () => {
                   {num}
                 </button>
               ))}
+            </div>
+          </div>
+        )}
+
+        {showPodobnePopup && (
+          <div className="rating-popup">
+            <button className="close-popup" onClick={handleClosePodobnePopup}>
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+            <p>Pytanie podobne do:</p>
+            <div>
+              <input
+                type="text"
+                placeholder="Enter your value"
+                value={numberP}
+                onChange={(e) => setNumberP(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+              <button onClick={() => handlePodobne(numberP)}>
+                Submit
+              </button>
             </div>
           </div>
         )}

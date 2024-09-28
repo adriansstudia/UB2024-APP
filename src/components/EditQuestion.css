@@ -89,6 +89,10 @@
   
   .save-button {
     background-color: #4CAF50;
+    position: fixed;
+    left: 45%;
+    display: flex;
+    bottom: 5%;
     color: white;
     padding: 10px 20px;
     border: none;

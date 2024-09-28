@@ -74,6 +74,10 @@ function App() {
     setQuestions(questions.map((question) => (question.id === id ? { ...question, rating } : question)));
   };
 
+  const updatePodobne = (id, numberP) => {
+    setQuestions(questions.map((question) => (question.id === id ? { ...question, numberP } : question)));
+  };
+
   const handleSort = (property) => {
     setSortBy(property);
   };
@@ -130,6 +134,7 @@ function App() {
           const newQuestions = result.data.map((row) => ({
             id: row.number, // Ensure id is unique or handled appropriately
             number: row.number,
+            numberP: row.numberP,
             question: row.question,
             kategoria: row.kategoria,
             zestaw: row.zestaw,
@@ -195,6 +200,7 @@ function App() {
                 setSortBy={setSortBy}
                 filterBy={filterBy}
                 setFilterBy={setFilterBy}
+                updatePodobne={updatePodobne}
               />
             }
           />
@@ -204,6 +210,7 @@ function App() {
               <QuestionDetail
                 questions={questions}
                 updateRating={updateRating}
+                updatePodobne={updatePodobne}
                 sortBy={sortBy}
                 filterBy={filterBy}
                 updateAIAnswer={updateAIAnswer}

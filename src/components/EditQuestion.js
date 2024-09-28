@@ -10,6 +10,7 @@ const EditQuestion = ({ questions, saveQuestion }) => {
   const navigate = useNavigate();
   const [editedQuestion, setEditedQuestion] = useState({
     number: '',
+    numberP: '',
     question: '',
     kategoria: '',
     zestaw: '',
@@ -60,6 +61,18 @@ const EditQuestion = ({ questions, saveQuestion }) => {
             <input 
               name="number" 
               value={editedQuestion.number} 
+              onChange={handleChange} 
+              type="text" 
+            />
+          </label>
+        </div>
+
+        <div className="edit-question-row">
+          <label>
+            NumberP:
+            <input 
+              name="numberP" 
+              value={editedQuestion.numberP} 
               onChange={handleChange} 
               type="text" 
             />
