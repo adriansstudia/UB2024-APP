@@ -360,7 +360,7 @@
 }
 .law-list-container{
 
-  height: 10%;
+  height: 15%;
 
 }
 .law-list-container.revealed{
@@ -588,15 +588,16 @@ input {
 }
 
 .search-section {
-  position: relative;
+  position: fixed;
   padding: 0px;
+  bottom: 27%;
   z-index: 5200;
 }
 
 .search-section input {
   width: 200px;
   padding: 5px;
-  margin-bottom: 0;
+  /* margin-bottom: 0; */
   margin-right: 10px;
 }
 

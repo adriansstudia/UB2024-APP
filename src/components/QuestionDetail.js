@@ -62,6 +62,20 @@ const QuestionDetail = ({ questions, updatePodobne, updateRating, sortBy, filter
   const acts = Acts();
 
 
+  // Filtered acts based on search term
+  const filteredActs = acts.filter((act) =>
+    act.title.toLowerCase().includes(searchTermList.toLowerCase())
+  );
+  
+  // Handler to select and display a specific act
+  const handleActClick = (actId) => {
+    const selectedAct = acts.find((act) => act.id === actId);
+    if (selectedAct) {
+      setAPContent(selectedAct.content);
+      setIsAPVisible(true);
+      setIsLawListVisible(false);
+    }
+  };
 
 useEffect(() => {
   // Replace all `id="..."` and all content after AKT="..." with clickable <span> elements
@@ -83,21 +97,35 @@ useEffect(() => {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = idValue;
     setSearchTerm(`id="${tempDiv.innerText}`); // Update with plain text
+    searchInLaw();
   };
 
   window.handleActIdClick = (actId2) => {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = actId2;
-    setSearchTermList(`${tempDiv.innerText}`); // Update with plain text
+    
+    // Set the search term for the list
+    setSearchTermList(`${tempDiv.innerText}`); 
+    
+    // Make the law list visible
     setIsLawListVisible(true);
+
+    // Find the act in the list and trigger handleActClick
+    const matchingAct = acts.find((act) => act.title === tempDiv.innerText);
+
+    // If the matching act is found, trigger handleActClick with the matching act's ID
+    if (matchingAct) {
+      handleActClick(matchingAct.id);
+    }
   };
 
   return () => {
     // Cleanup the global functions when the component unmounts
     delete window.handleIdClick;
-    delete window.handleActIdClick; // Clean up the act click handler
+    delete window.handleActIdClick; 
   };
-}, []);
+}, [acts, setSearchTermList, handleActClick]);
+
 
 
 
@@ -533,17 +561,6 @@ useEffect(() => {
     setIsLawEdited(true); // Set the state to show the editor
   };
   
-  
-  
-  // Handler to select and display a specific act
-  const handleActClick = (actId) => {
-    const selectedAct = acts.find((act) => act.id === actId);
-    if (selectedAct) {
-      setAPContent(selectedAct.content);
-      setIsAPVisible(true);
-      setIsLawListVisible(false);
-    }
-  };
 
 
 
@@ -552,10 +569,7 @@ const handleSearchChange = (e) => setSearchTerm(e.target.value);
   // Handler for search input
 const handleSearchChangeList = (e) => setSearchTermList(e.target.value);
 
-// Filtered acts based on search term
-const filteredActs = acts.filter((act) =>
-  act.title.toLowerCase().includes(searchTermList.toLowerCase())
-);
+
 
 const escapeSpecialCharacters = (text) => {
   return text.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -873,7 +887,9 @@ const getHighlightedLawContent = () => {
             />
           </div> */}
           <div className={`law-container ${isLawVisible ? 'revealed' : ''}`}>
-              <div className="search-section">
+          
+            {isAPVisible && (
+             <div className="search-section">
                 <input
                   type="text"
                   value={searchTerm}
@@ -889,7 +905,8 @@ const getHighlightedLawContent = () => {
                 <button onClick={goToNextMatch}>
                   <FontAwesomeIcon icon={faArrowRight} />
                 </button>
-              </div>
+              </div>    
+            )}
             <div className={`law-list-container ${isLawListVisible ? 'revealed' : ''}`}>
 
                 {/* Table to display filtered acts */}
@@ -964,9 +981,7 @@ const getHighlightedLawContent = () => {
                 <button className="law-AP-close" onClick={() => setIsAPVisible(false)}><FontAwesomeIcon icon={faTimes} /></button>
               </div>
               <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}dangerouslySetInnerHTML={{ __html: getHighlightedLawContent() }} />
-
-              
-
+    
             </div>
           </div>
           <div className={`bottom-mask ${isLawVisible ? 'revealed' : ''}`}></div>
