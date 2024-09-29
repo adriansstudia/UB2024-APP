@@ -56,8 +56,49 @@ const QuestionDetail = ({ questions, updatePodobne, updateRating, sortBy, filter
   const [recognition, setRecognition] = useState(null); // Store recognition instance
   const [transcript, setTranscript] = useState('');
   const [lastFinalResult, setLastFinalResult] = useState(''); // Track the last final result
+  const [modifiedLawContent, setModifiedLawContent] = useState('');
+  const [selectedActTitle, setSelectedActTitle] = useState('');
 
   const acts = Acts();
+
+
+
+useEffect(() => {
+  // Replace all `id="..."` and all content after AKT="..." with clickable <span> elements
+  const newContent = lawContent
+    .replace(/id="([^"]+)"/g, (match, idValue) => {
+      return `<span class="clickable-id" style="cursor: pointer;" onclick="handleIdClick('${idValue}')">${match}</span>`;
+    })
+    .replace(/AKT="([^"]+)"/g, (match, actId2) => {
+      // Create a clickable span with the original content, preserving HTML
+      return `<span class="clickable-id" style="cursor: pointer;" onclick="handleActIdClick('${actId2}')">${match}</span>`;
+    });
+
+  setModifiedLawContent(newContent);
+}, [lawContent]);
+
+useEffect(() => {
+  // Define the global function to set searchTerm for ID
+  window.handleIdClick = (idValue) => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = idValue;
+    setSearchTerm(`id="${tempDiv.innerText}`); // Update with plain text
+  };
+
+  window.handleActIdClick = (actId2) => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = actId2;
+    setSearchTermList(`${tempDiv.innerText}`); // Update with plain text
+    setIsLawListVisible(true);
+  };
+
+  return () => {
+    // Cleanup the global functions when the component unmounts
+    delete window.handleIdClick;
+    delete window.handleActIdClick; // Clean up the act click handler
+  };
+}, []);
+
 
 
 
@@ -464,7 +505,7 @@ const QuestionDetail = ({ questions, updatePodobne, updateRating, sortBy, filter
 
   const modules = {
     toolbar: [
-      // [{ 'header': [1, 2, false] }],             // Header levels
+      [{ 'header': [1, 2, false] }],             // Header levels
       ['bold', 'italic', 'underline'],           // Bold, Italic, Underline
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Ordered and unordered lists
       [{ 'color': [] }, { 'background': [] }],   // Text color and background color
@@ -484,6 +525,16 @@ const QuestionDetail = ({ questions, updatePodobne, updateRating, sortBy, filter
     }
   };
 
+  const copyActTitle = (title) => {
+    // Add a small break (4px) before 'AKT="' and use plain text from the title
+    setLawContent((prevLawContent) => 
+      `${prevLawContent}<div style="height: 4px;"></div><div>AKT="${title}"</div><div style="height: 4px;"></div><div>id=""</div>`
+    );
+    setIsLawEdited(true); // Set the state to show the editor
+  };
+  
+  
+  
   // Handler to select and display a specific act
   const handleActClick = (actId) => {
     const selectedAct = acts.find((act) => act.id === actId);
@@ -493,6 +544,9 @@ const QuestionDetail = ({ questions, updatePodobne, updateRating, sortBy, filter
       setIsLawListVisible(false);
     }
   };
+
+
+
   // Handler for search input
 const handleSearchChange = (e) => setSearchTerm(e.target.value);
   // Handler for search input
@@ -566,18 +620,37 @@ const searchInLaw = () => {
 const getHighlightedLawContent = () => {
   // Remove all class attributes (e.g., class="...") from APContent
   const cleanedContent = APContent
-  .replace(/class="[^"]*"/g, '')
-  .replace(/href="[^"]*"/g, '') // Remove href attributes
+  // .replace(/class="[^"]*"/g, '')
+  // .replace(/href="[^"]*"/g, '') // Remove href attributes
   .replace(/<a/g, '<strong')       // Replace <a with <strong
   .replace(/<\/a>/g, '</strong>')  // Replace </a> with </strong>
-  .replace(/<span/g, '<span style="color: black;"') 
-  // .replace(/<div id="/g, '<div style="color: green;"') 
+ 
+  // // .replace(/<div id="/g, '<div style="color: green;"') 
 
-  .replace(/([a-zA-Z0-9]+)\.&nbsp;/g, '<strong>$1.&nbsp;</strong>') // Replace any letter or number followed by .&nbsp; with <strong>
-  .replace(/([a-zA-Z0-9]+)\)\s*<\/div>/g, '<strong>$1)</strong></div>')
+  // .replace(/([a-zA-Z0-9]+)\.&nbsp;/g, '<strong style="color:black" $1.&nbsp;</strong>') // Replace any letter or number followed by .&nbsp; with <strong>
+  // .replace(/([a-zA-Z0-9]+)\)\s*<\/div>/g, '<strong>$1)</strong></div>')
 
-  .replace(/data-unit-id="[^"]*"/g, '')
-  // .replace(/<div\s+id="([^"]+)"\s*[^>]*>/g, '<div><small style="color:grey;" id="$1"></small>')
+  // .replace(/data-unit-id="[^"]*"/g, '<div style="color: blue;" id="$1"')
+  // .replace(/<div\s+id="([^"]+)"\s*[^>]*>/g, '<div <small style="color:grey;" id="$1"></small>')
+  // .replace(/id="([^"]+)"/g, 'style="color: green;" id="$1"')
+  // .replace(/<span/g, '<span style="color: black;"') 
+
+  // .replace(/>\.([^"]+)\.&nbsp;</g, '><span style="color: black;"$1</span><');
+  .replace(/>\s*([^<]+)<\/div>/g, '><strong style="color: black;">$1</strong></div>')
+  .replace(/href="[^"]*"/g, '')
+  .replace(/class="[^"]*"/g, '')
+
+  // .replace(/<span/g, '<span style="color: grey"')
+  // .replace(/<a/g, '<a style="color: grey"')
+  // .replace(/<p/g, '<p style="color: grey"')
+  .replace(/>\s*\[([^\]]+)\]</g, '><strong style="color: black;">[$1]</strong><')
+  // .replace(/>\s*([^<]+)<span/g, '><strong style="color: grey;">$1</strong><span')
+  .replace(/>\s*([^<]+)</g, '><span style="color: black;">$1</span><')
+
+
+  
+  
+
 
 
   if (searchTerm) {
@@ -808,6 +881,23 @@ const getHighlightedLawContent = () => {
             />
           </div> */}
           <div className={`law-container ${isLawVisible ? 'revealed' : ''}`}>
+              <div className="search-section">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  placeholder="Search in legal act..."
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button onClick={searchInLaw}>
+                  <FontAwesomeIcon icon={faSearch} />
+                </button>
+                <button onClick={goToPreviousMatch}>
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
+                <button onClick={goToNextMatch}>
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </button>
+              </div>
             <div className={`law-list-container ${isLawListVisible ? 'revealed' : ''}`}>
                 <input
                   className='search-bar'
@@ -816,20 +906,37 @@ const getHighlightedLawContent = () => {
                   value={searchTermList}
                   onChange={handleSearchChangeList}
                 />
-                <ul >
-                {filteredActs.map((act) => (
-                  <li key={act.id}>
-                    <button onClick={() => handleActClick(act.id)}>{act.title}</button>
-                  </li>
-                ))}
-              </ul>
+                {/* Table to display filtered acts */}
+                <table className="acts-table">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Action</th>
+                      
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredActs.map((act) => (
+                      <tr key={act.id}>
+                        <td>
+                          {/* Button to copy the title */}
+                          <button onClick={() => copyActTitle(act.title)}>Copy </button>
+                        </td>
+                        <td>
+                          {/* Button to open the act */}
+                          <button onClick={() => handleActClick(act.id)}>{act.title}</button>
+                        </td>
+
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               
             </div>
             <h4>instrukcja: WT: id="par(13)ust(1)pkt(1)lit(b)"_  PB: id="art(2)ust(2)pkt(1)lit(b)"</h4>
-
-            <div dangerouslySetInnerHTML={{ __html: lawContent }} />
             
-
+            <div dangerouslySetInnerHTML={{ __html: modifiedLawContent }} />
+      
 
             {/* Law AP Container */}
             <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}>

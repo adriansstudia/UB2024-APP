@@ -292,6 +292,7 @@
 .law-ap-container {
   height: 60%;
   background: rgba(255, 255, 255, 0.9);
+  color: rgb(172, 172, 172);
 }
 
 .law-ap-container.revealed {
@@ -380,6 +381,7 @@ input {
   left: 10px; /* Add left margin for positioning */
   right: 10px; /* Add right margin for positioning */
   padding: 10px; /* Optional: add padding for better spacing */
+  z-index: 2000;
 }
 
 .ql-container{
@@ -570,3 +572,7 @@ input {
   width: 100%;
 }
 
+.clickable-id {
+  cursor: pointer;
+  color: blue; /* Optional: To visually indicate that it is clickable */
+}
