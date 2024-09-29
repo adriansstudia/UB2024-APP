@@ -609,8 +609,13 @@ input {
 
 .clickable-id {
   cursor: pointer;
-  color: rgb(17, 0, 255); /* Optional: To visually indicate that it is clickable */
+  color: rgb(39, 133, 255); /* Optional: To visually indicate that it is clickable */
   font-weight: bold;
-  text-decoration: underline;
+  /* text-decoration: underline; */
 }
-
+.clickable-act {
+  cursor: pointer;
+  color: rgb(0, 81, 255);  /* Optional: To visually indicate that it is clickable */
+  font-weight: bold;
+  /* text-decoration: underline; */
+}

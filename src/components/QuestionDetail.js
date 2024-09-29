@@ -71,7 +71,7 @@ useEffect(() => {
     })
     .replace(/AKT="([^"]+)"/g, (match, actId2) => {
       // Create a clickable span with the original content, preserving HTML
-      return `<span class="clickable-id" style="cursor: pointer;" onclick="handleActIdClick('${actId2}')">${match}</span>`;
+      return `<span class="clickable-act" style="cursor: pointer;" onclick="handleActIdClick('${actId2}')">${match}</span>`;
     });
 
   setModifiedLawContent(newContent);
