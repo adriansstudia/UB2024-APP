@@ -674,21 +674,20 @@ const QuestionsList = ({
 
 
         <div className="questions-list">
-          <div className="filter-button">
-            <select onChange={(e) => handleFilter(e.target.value)} value={filterBy}className="filter-button">
-              <option value="">Kategorie</option>
-              {kategoriaOptions.map(kategoria => (
-                <option key={kategoria} value={kategoria}>{kategoria}</option>
-              ))}
-            </select>
-          </div>
-          {/* <button className="save-main1" onClick={autosave}>Save St</button>
-          <button className="save-main2" onClick={loadAutosaveAndReplace}>Load AS</button> */}
+          <div className="question-container-head">
+            <div className="filter-button">
+              <select onChange={(e) => handleFilter(e.target.value)} value={filterBy}className="filter-button">
+                <option value="">Kategorie</option>
+                {kategoriaOptions.map(kategoria => (
+                  <option key={kategoria} value={kategoria}>{kategoria}</option>
+                ))}
+              </select>
+            </div>
 
-          <div className="question-info">
-            <p>Total Questions: {filteredQuestions.length}</p>
-          </div>
-          <div className="question-container">
+            <div className="question-info">
+              <p>Total Questions: {filteredQuestions.length}</p>
+            </div>
+
             <div className="question-header">
               <div className="column-head">lp</div>
               <div onClick={() => handleSort("number")} className="column-head">Nr<FontAwesomeIcon icon={faSortUp}/></div>
@@ -699,14 +698,11 @@ const QuestionsList = ({
               <div onClick={() => handleSort("zestaw")} className="column-head">Zest.<FontAwesomeIcon icon={faSortUp}/></div>
               <div onClick={() => handleSort("rating")} className="column-head">Rat.<FontAwesomeIcon icon={faSortUp}/></div>
 
-              {/* <div className="column">Nr</div> 
-              <div className="column">Pytanie</div>
-              <div className="column">Kat.</div>
-              <div className="column">Zest.</div>
-              <div className="column">Rat.</div>*/}
-              {/*<div className="column">AI</div>
-              <div className="column">Law</div>*/}
             </div>
+
+          </div>
+          <div className="question-container">
+
             
             <ul>
               {filteredQuestions.map((question, index) => (
