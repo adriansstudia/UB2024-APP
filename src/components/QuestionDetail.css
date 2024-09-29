@@ -168,10 +168,10 @@
 
 .law-list-button{
   position: fixed;
+  display: block;
   width: 10%;
-  left: 90%;
-  text-align: center;
-  bottom: 28.5%;
+  left: 92%;
+  bottom: 28%;
   z-index: 1500;
   color: #ffffff;
   background-color: #242424;
@@ -291,6 +291,7 @@
 
 .law-ap-container {
   height: 63%;
+
   background: rgba(255, 255, 255, 0.9);
   color: rgb(172, 172, 172);
 }
@@ -360,7 +361,7 @@
 }
 .law-list-container{
 
-  height: 15%;
+  height: 25%;
 
 }
 .law-list-container.revealed{
@@ -590,15 +591,21 @@ input {
 .search-section {
   position: fixed;
   padding: 0px;
-  bottom: 27%;
+  left: 9px;
+  bottom: 27.5%;
   z-index: 5200;
+  text-align: justify;
+  background: #00000031;
+  padding-left: 10px;
+  padding-right: 61px;
+  border-radius: 0px;
 }
 
 .search-section input {
-  width: 200px;
-  padding: 5px;
+  width: 190px;
+  padding: 0px;
   /* margin-bottom: 0; */
-  margin-right: 10px;
+  margin: 10px;
 }
 
 .search-bar{

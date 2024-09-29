@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './QuestionDetail.css'; // Import the CSS file
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit, faExpand, faSave, faCircle, faUpload, faSearch, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit, faExpand, faSave, faCircle, faUpload, faSearch, faArrowRight, faCopy } from '@fortawesome/free-solid-svg-icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import the Quill CSS
 import { useSwipeable } from 'react-swipeable';
@@ -685,6 +685,29 @@ const getHighlightedLawContent = () => {
 
 
 
+// Function to copy highlighted text to clipboard
+const copyHighlightedTextToClipboard = () => {
+  // Get all highlighted elements
+  const highlightedElements = document.querySelectorAll('.highlight, .highlight-current');
+  let highlightedText = '';
+
+  // Loop through each element and append its text to the string
+  highlightedElements.forEach((element) => {
+    highlightedText += element.textContent + ' ';
+  });
+
+  // Copy the highlighted text to the clipboard
+  navigator.clipboard.writeText(highlightedText.trim())
+  
+  // .then(() => {
+  //   alert('Highlighted text copied to clipboard!');
+  // }).catch((error) => {
+  //   console.error('Failed to copy text: ', error);
+  // });
+};
+
+
+
   return (
     <div className="question-detail-background">
         <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
@@ -752,9 +775,7 @@ const getHighlightedLawContent = () => {
           {isLawVisible && (
             <>
               {/* <button className='save-button-ai' onClick={setIsLawListVisible(true)}></button> */}
-              <button className="law-list-button" onClick={handleRevealLawList}>
-                AP
-              </button>
+              <button className="law-list-button" onClick={handleRevealLawList}>AP</button>
               <button className="law-hide-button" onClick={() => setIsLawVisible(false)}>
                 Hide Law
               </button>
@@ -890,6 +911,7 @@ const getHighlightedLawContent = () => {
           
             {isAPVisible && (
              <div className="search-section">
+                <button onClick={copyHighlightedTextToClipboard}><FontAwesomeIcon icon={faCopy} /></button>
                 <input
                   type="text"
                   value={searchTerm}
@@ -905,6 +927,7 @@ const getHighlightedLawContent = () => {
                 <button onClick={goToNextMatch}>
                   <FontAwesomeIcon icon={faArrowRight} />
                 </button>
+                
               </div>    
             )}
             <div className={`law-list-container ${isLawListVisible ? 'revealed' : ''}`}>
@@ -980,7 +1003,10 @@ const getHighlightedLawContent = () => {
               <div>
                 <button className="law-AP-close" onClick={() => setIsAPVisible(false)}><FontAwesomeIcon icon={faTimes} /></button>
               </div>
+              
               <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}dangerouslySetInnerHTML={{ __html: getHighlightedLawContent() }} />
+                  {/* Button to copy highlighted text */}
+              
     
             </div>
           </div>
