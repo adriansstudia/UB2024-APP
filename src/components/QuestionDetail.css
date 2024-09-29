@@ -290,7 +290,7 @@
 }
 
 .law-ap-container {
-  height: 60%;
+  height: 63%;
   background: rgba(255, 255, 255, 0.9);
   color: rgb(172, 172, 172);
 }
@@ -302,6 +302,18 @@
   color: grey; /* Change this color to your desired shade of grey */
   font-family: monospace; /* Optional: use a monospace font for a code-like appearance */
 }
+
+.ap-title{
+  color: rgb(255, 255, 255);
+  position: relative;
+  font-size: 12px;
+  font-weight: bold;
+  background-color: rgba(99, 99, 99, 0.9);
+  padding: 5px;
+  border-radius: 9px;
+  z-index: 2500;
+}
+
 
 .ai-answer-editor {
   flex-grow: 1; /* Fills the remaining space in the container */
@@ -447,6 +459,27 @@ input {
   color: #242424;
 }
 
+.clear-button2{
+  background: none;
+  color: #888;
+  border: none;
+  padding: 0px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+}
+.clear-button {
+  background: none;
+  color: #888;
+  border: none;
+  padding: 0px;
+  cursor: pointer;
+  font-size: 8px;
+  display: flex;
+}
+
+
 /* Arrows */
 .prev-arrow, .next-arrow {
   font-size: 24px;
@@ -503,10 +536,12 @@ input {
 .close-popup:hover { color: red; }
 
 .law-AP-close{
-  position: fixed;
-  bottom: 86%;
-  left: 90%;
-  background: none;
+  position: relative;
+  left: 93%;
+  color: white;
+  background-color: #0000008e;
+  border-radius: 9px;
+  padding: 5px;
   border: none;
   font-size: 20px;
   cursor: pointer;
@@ -553,26 +588,29 @@ input {
 }
 
 .search-section {
-  position: fixed;
-  display: block;
-  align-items: center;
-  margin-bottom: 10px;
+  position: relative;
+  padding: 0px;
   z-index: 5200;
 }
 
 .search-section input {
   width: 200px;
   padding: 5px;
-
+  margin-bottom: 0;
   margin-right: 10px;
 }
 
 .search-bar{
-
+  font-size: 10px;
+  padding: 3px;
   width: 100%;
+  text-align: justify;
 }
 
 .clickable-id {
   cursor: pointer;
-  color: blue; /* Optional: To visually indicate that it is clickable */
+  color: rgb(17, 0, 255); /* Optional: To visually indicate that it is clickable */
+  font-weight: bold;
+  text-decoration: underline;
 }
+

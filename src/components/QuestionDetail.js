@@ -505,13 +505,13 @@ useEffect(() => {
 
   const modules = {
     toolbar: [
-      [{ 'header': [1, 2, false] }],             // Header levels
-      ['bold', 'italic', 'underline'],           // Bold, Italic, Underline
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Ordered and unordered lists
-      [{ 'color': [] }, { 'background': [] }],   // Text color and background color
-      [{ 'align': [] }],                         // Align text (left, center, right, justify)
-      ['link', 'image'],                         // Insert link and image
-      ['speech'], // Add custom button for speech recognition
+      // [{ 'header': [1, 2, false] }],             // Header levels
+      ['bold', 'italic', 'underline', { 'header': [1, 2, false] }, { 'list': 'ordered'}, { 'list': 'bullet' }, { 'color': [] }, { 'background': [] }, { 'align': [] }],           // Bold, Italic, Underline
+      // [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Ordered and unordered lists
+      // [{ 'color': [] }, { 'background': [] }],   // Text color and background color
+      // [{ 'align': [] }],                         // Align text (left, center, right, justify)
+      // ['link', 'image'],                         // Insert link and image
+      // ['speech'], // Add custom button for speech recognition
     ],
     clipboard: {
       matchVisual: false // Prevent weird styles from pasting content
@@ -750,15 +750,7 @@ const getHighlightedLawContent = () => {
               <FontAwesomeIcon icon={faEdit} className="hide-button-ai" onClick={handleLawEdit} />
             </>
           )}
-          {isAPVisible && (
-            
-            <>
-              <div className="">
-                <button className="law-AP-close" onClick={() => setIsAPVisible(false)}><FontAwesomeIcon icon={faTimes} /></button>
-              </div>
-            </>
-            
-          )}
+
 
 
           {isLawEdited && (
@@ -899,19 +891,26 @@ const getHighlightedLawContent = () => {
                 </button>
               </div>
             <div className={`law-list-container ${isLawListVisible ? 'revealed' : ''}`}>
-                <input
-                  className='search-bar'
-                  type="text"
-                  placeholder="Search acts..."
-                  value={searchTermList}
-                  onChange={handleSearchChangeList}
-                />
+
                 {/* Table to display filtered acts */}
                 <table className="acts-table">
                   <thead>
                     <tr>
-                      <th>Title</th>
-                      <th>Action</th>
+                      <th>
+                        <button className="clear-button2" onClick={() => setSearchTermList('')}>
+                          <i className="fa fa-times" aria-hidden="true"></i>
+                        </button>
+                      </th>
+                      <th>
+                        <input
+                          className='search-bar'
+                          type="text"
+                          placeholder="Search acts..."
+                          value={searchTermList}
+                          onChange={handleSearchChangeList}
+                        />
+                      </th>
+                      
                       
                     </tr>
                   </thead>
@@ -920,11 +919,11 @@ const getHighlightedLawContent = () => {
                       <tr key={act.id}>
                         <td>
                           {/* Button to copy the title */}
-                          <button onClick={() => copyActTitle(act.title)}>Copy </button>
+                          <button className="clear-button2" onClick={() => copyActTitle(act.title)}>Copy </button>
                         </td>
                         <td>
                           {/* Button to open the act */}
-                          <button onClick={() => handleActClick(act.id)}>{act.title}</button>
+                          <button className='search-bar' onClick={() => handleActClick(act.id)}>{act.title}</button>
                         </td>
 
                       </tr>
@@ -933,15 +932,17 @@ const getHighlightedLawContent = () => {
                 </table>
               
             </div>
-            <h4>instrukcja: WT: id="par(13)ust(1)pkt(1)lit(b)"_  PB: id="art(2)ust(2)pkt(1)lit(b)"</h4>
+            <h5 className='clear-button'>instrukcja: WT: id="par(13)ust(1)pkt(1)lit(b)"_  PB: id="art(2)ust(2)pkt(1)lit(b)"</h5>
             
             <div dangerouslySetInnerHTML={{ __html: modifiedLawContent }} />
       
 
             {/* Law AP Container */}
             <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}>
-              
-              <div className="search-section">
+              <div className="ap-title">
+                {question.question}
+              </div>
+              {/* <div className="search-section">
                 <input
                   type="text"
                   value={searchTerm}
@@ -957,8 +958,11 @@ const getHighlightedLawContent = () => {
                 <button onClick={goToNextMatch}>
                   <FontAwesomeIcon icon={faArrowRight} />
                 </button>
-              </div>
+              </div> */}
               {/* Display the law content with highlighted matches */}
+              <div>
+                <button className="law-AP-close" onClick={() => setIsAPVisible(false)}><FontAwesomeIcon icon={faTimes} /></button>
+              </div>
               <div className={`law-ap-container ${isAPVisible ? 'revealed' : ''}`}dangerouslySetInnerHTML={{ __html: getHighlightedLawContent() }} />
 
               
