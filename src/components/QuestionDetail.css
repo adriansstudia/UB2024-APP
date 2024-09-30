@@ -128,7 +128,7 @@
 }
 
 .answer-container.revealed {
-  max-height: 5000px;
+  max-height: 15000px;
   transition: max-height 0.5s ease-in;
   margin-left: -15px;
   margin-right: -15px;
