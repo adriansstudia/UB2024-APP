@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faEllipsisV, faEdit, faTrashAlt, faExpand, faSortUp, faCircle, faUpload, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faEllipsisV, faEdit, faTrashAlt, faExpand, faSortUp, faCircle, faUpload, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './QuestionsList.css'; // Import your custom styles
 
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
@@ -25,7 +25,8 @@ const QuestionsList = ({
   sortBy,
   setSortBy,
   filterBy,
-  setFilterBy
+  setFilterBy,
+  updatePodobne
 }) => {
   const [filteredQuestions, setFilteredQuestions] = useState([]);
   const [kategoriaOptions, setKategoriaOptions] = useState([]);
@@ -38,8 +39,37 @@ const QuestionsList = ({
   const [autosaveEnabled, setAutosaveEnabled] = useState(false); // State for checkbox
   const [autosaveInterval, setAutosaveInterval] = useState(null); // State for autosave interval
   const [menuVisible, setMenuVisible] = useState(false); // State to control menu visibility
+  const [showPodobnePopup, setShowPodobnePopup] = useState(false);
+  const [selectedQuestionId, setSelectedQuestionId] = useState(null); // Track selected question ID
+  const [numberP, setNumberP] = useState(''); // Track the current numberP value
+
+
   const navigate = useNavigate();
 
+
+  // Handler to open the Podobne popup
+  const handlePodobneNr = (question, e) => {
+    e.stopPropagation(); // Stop event propagation
+    setSelectedQuestionId(question.id); // Set the selected question ID
+    setNumberP(question.numberP); // Set numberP from the clicked question
+    setShowPodobnePopup(true); // Show the popup
+  };
+
+  // Handler to close the popup
+  const handleClosePodobnePopup = () => setShowPodobnePopup(false);
+
+  // Handle submission of the new Podobne number
+  const handlePodobne = (newNumberP) => {
+    updatePodobne(selectedQuestionId, newNumberP); // Update the selected question
+    setShowPodobnePopup(false); // Close popup after update
+  };
+
+  // Handle "Enter" key press to submit the numberP
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handlePodobne(numberP);
+    }
+  };
   // useEffect(() => {
   //   const savedAutosaveState = localStorage.getItem('autosaveEnabled');
   //   if (savedAutosaveState) {
@@ -720,7 +750,10 @@ const QuestionsList = ({
                   <div className="column">{question.number}</div>
                   
                   <div className="column">{question.question}</div>
-                  <div className="column">{question.numberP}</div>
+                  <div className="column" >
+                    <button  className="podobne" onClick={(e) => handlePodobneNr(question, e)} >{question.numberP}</button>
+                  </div>
+                  
                   <div className="column">{question.kategoria}</div>
                   <div className="column">{question.zestaw}</div>
                   <div className={getRatingClass(question.rating)}>{question.rating}</div>
@@ -729,6 +762,7 @@ const QuestionsList = ({
                   <div className="column">{question.law}</div>*/}
 
                   <div className="actions">
+                  
                     <button onClick={(e) => handleEdit(question.id, e)} className="action-button">
                       <FontAwesomeIcon icon={faEdit} />
                     </button>
@@ -743,6 +777,27 @@ const QuestionsList = ({
           {showConfirmPopup && (
             <div className="confirm-popup">
 
+            </div>
+          )}
+
+
+          {/* Podobne Popup */}
+          {showPodobnePopup && (
+            <div className="rating-popup">
+              <button className="close-popup" onClick={handleClosePodobnePopup}>
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+              <p>Pytanie podobne do:</p>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Enter your value"
+                  value={numberP}
+                  onChange={(e) => setNumberP(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                <button onClick={() => handlePodobne(numberP)}>Submit</button>
+              </div>
             </div>
           )}
         </div>
