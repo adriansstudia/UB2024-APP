@@ -855,7 +855,7 @@ const copyHighlightedTextToClipboard = () => {
           <div className={`bottom-mask ${isAIAnswerVisible ? 'revealed' : ''}`}></div>
 
 
-          {/* <div className={`ai-answer-container-ed ${isAIAnswerEdited ? 'revealed' : ''}`}>
+          <div className={`ai-answer-container-ed ${isAIAnswerEdited ? 'revealed' : ''}`}>
             <ReactQuill 
               className="ai-answer-editor"
               theme="snow"
@@ -864,12 +864,8 @@ const copyHighlightedTextToClipboard = () => {
               modules={modules}
               readOnly= {false}    
             />
-            <button onClick={toggleListening}>
-              {isListening ? 'Stop Listening' : 'Start Listening'}
-            </button>
-            <p>Transcript: {transcript}</p> 
-            
-          </div> */}
+
+          </div> 
           
             
           {/* <div className={`law-container ${isLawVisible ? 'revealed' : ''}`}>Akty Prawne / Normy / Opracowania:
