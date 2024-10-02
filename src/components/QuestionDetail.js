@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './QuestionDetail.css'; // Import the CSS file
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit, faExpand, faSave, faCircle, faUpload, faSearch, faArrowRight, faCopy } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesLeft, faAnglesRight, faArrowLeft, faTimes, faEdit, faExpand, faSave, faCircle, faUpload, faSearch, faArrowRight, faCopy, faSolid, faComments } from '@fortawesome/free-solid-svg-icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import the Quill CSS
 import { useSwipeable } from 'react-swipeable';
@@ -31,8 +31,9 @@ const QuestionDetail = ({ questions, updatePodobne, updateRating, sortBy, filter
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAIAnswerVisible, setIsAIAnswerVisible] = useState(false);
   const [isAIAnswerEdited, setIsAIAnswerEdited] = useState(false);
-
   const [aiAnswerContent, setAiAnswerContent] = useState('');
+
+  const [isAIChatVisible, setIsAIChatVisible] = useState(false);
 
   const [isLawVisible, setIsLawVisible] = useState(false);
   const [isLawListVisible, setIsLawListVisible] = useState(false);
@@ -507,6 +508,9 @@ useEffect(() => {
   const handleAPChange = (content) => setAPContent(content);
 
   const handleRevealAIAnswer = () => setIsAIAnswerVisible(true);
+  const handleRevealAIChat = () => setIsAIChatVisible(!isAIChatVisible);
+  const handleHideAIChat = () => setIsAIChatVisible(false);
+
   const handleHideAIAnswer = () => setIsAIAnswerVisible(false);
   const handleAIAnswerEdit = () => setIsAIAnswerEdited(true);
   const handleAIAnswerHide = () => setIsAIAnswerEdited(false);
@@ -737,11 +741,16 @@ const copyHighlightedTextToClipboard = () => {
         <FontAwesomeIcon icon={faAnglesLeft} className="prev-arrow" onClick={handlePrevious} />
         <FontAwesomeIcon icon={faAnglesRight} className="next-arrow" onClick={handleNext} />
 
+          <button className="ai-chat-button" onClick={handleRevealAIChat}>
+          <FontAwesomeIcon icon={faComments} />
+          </button>
+
           {!isAIAnswerVisible && (
             <button className="ai-answer-button" onClick={handleRevealAIAnswer}>
               AI
             </button>
           )}
+
           {isAIAnswerVisible && (
             <>
               <button className="hide-button-ai" onClick={() => setIsAIAnswerVisible(false)}>
@@ -843,6 +852,18 @@ const copyHighlightedTextToClipboard = () => {
             />        
           </div>
 
+          <div className={`ai-chat-container ${isAIChatVisible ? 'revealed' : ''}`}>
+            <iframe
+              src="https://www.chatbase.co/chatbot-iframe/SOBQ5Bw3qrZ-GreRiQ1Vb"
+              width="100%"
+              height="95%" 
+              style={{ border: 'none' }} // Remove border from iframe
+              allowFullScreen
+              frameborder="0"
+            ></iframe>
+          </div>
+
+
           <div className={`ai-answer-container ${isAIAnswerVisible ? 'revealed' : ''}`}>
             <ReactQuill 
               className="ai-answer-editor"
@@ -850,7 +871,7 @@ const copyHighlightedTextToClipboard = () => {
               value={aiAnswerContent}
               modules={modulesHidden}
               readOnly= {true}    
-            />                        
+            />                 
           </div>
           <div className={`bottom-mask ${isAIAnswerVisible ? 'revealed' : ''}`}></div>
 
