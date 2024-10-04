@@ -366,7 +366,7 @@
 
 
 /* Specific styling for lists */
-.law-list-container ul, .law-list-container li, .law-list-container ol, .law-container ul, .law-container li, .ai-answer-editor, .ql-editor ol, .ql-editor ul, .ql-editor li, .ql-editor {
+.ai-answer-container ul, .ai-answer-container li, .ai-answer-container ol, .ai-answer-container ul, .law-list-container ul, .law-list-container li, .law-list-container ol, .law-container ul, .law-container li, .ai-answer-editor, .ql-editor ol, .ql-editor ul, .ql-editor li, .ql-editor {
   padding-left: 00px; /* Adjust padding for lists */
   padding-bottom: 0px;
   padding-top: 0px;
@@ -377,7 +377,7 @@
   line-height: 1.5;
 }
 
-.law-list-container, .law-ap-container, .law-container{
+.ai-answer-container, .law-list-container, .law-ap-container, .law-container{
   text-align: justify;
   display: block;
   padding-left: 25px!important;
@@ -655,7 +655,7 @@ input {
   /* text-decoration: underline; */
 }
 
-.question-detail-container {
+/* .question-detail-container {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
@@ -699,4 +699,4 @@ button {
   color: white;
   border: none;
   cursor: pointer;
-}
+} */

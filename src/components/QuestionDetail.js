@@ -62,6 +62,7 @@ const QuestionDetail = ({ questions, updatePodobne, updateRating, sortBy, filter
   const [transcript, setTranscript] = useState('');
   const [lastFinalResult, setLastFinalResult] = useState(''); // Track the last final result
   const [modifiedLawContent, setModifiedLawContent] = useState('');
+  const [modifiedAIContent, setModifiedAIContent] = useState('');
   const [selectedActTitle, setSelectedActTitle] = useState('');
   // const [messages, setMessages] = useState([]);  // Chat history
   // const [userInput, setUserInput] = useState(""); // Input field value
@@ -99,6 +100,21 @@ useEffect(() => {
   setModifiedLawContent(newContent);
 }, [lawContent]);
 
+
+useEffect(() => {
+  // Replace all `id="..."` and all content after AKT="..." with clickable <span> elements
+  const newContent = aiAnswerContent
+    .replace(/id="([^"]+)"/g, (match, idValue) => {
+      return `<span class="clickable-id" style="cursor: pointer;" onclick="handleIdClick('${idValue}')">${match}</span>`;
+    })
+    .replace(/AKT="([^"]+)"/g, (match, actId2) => {
+      // Create a clickable span with the original content, preserving HTML
+      return `<span class="clickable-act" style="cursor: pointer;" onclick="handleActIdClick('${actId2}')">${match}</span>`;
+    });
+
+  setModifiedAIContent(newContent);
+}, [aiAnswerContent]);
+
 useEffect(() => {
   // Define the global function to set searchTerm for ID
   window.handleIdClick = (idValue) => {
@@ -133,7 +149,6 @@ useEffect(() => {
     delete window.handleActIdClick; 
   };
 }, [acts, setSearchTermList, handleActClick]);
-
 
 
 
@@ -676,12 +691,6 @@ const getHighlightedLawContent = () => {
   // .replace(/>\s*([^<]+)<span/g, '><strong style="color: grey;">$1</strong><span')
   .replace(/>\s*([^<]+)</g, '><span style="color: black;">$1</span><')
 
-
-  
-  
-
-
-
   if (searchTerm) {
     // Escape special characters for the search term
     const escapedSearchTerm = escapeSpecialCharacters(searchTerm);
@@ -945,13 +954,14 @@ const copyHighlightedTextToClipboard = () => {
 
 
           <div className={`ai-answer-container ${isAIAnswerVisible ? 'revealed' : ''}`}>
-            <ReactQuill 
+            {/* <ReactQuill 
               className="ai-answer-editor"
               theme="snow"
               value={aiAnswerContent}
               modules={modulesHidden}
               readOnly= {true}    
-            />                 
+            />                  */}
+            <div dangerouslySetInnerHTML={{ __html: modifiedAIContent }} />
           </div>
           <div className={`bottom-mask ${isAIAnswerVisible ? 'revealed' : ''}`}></div>
 
