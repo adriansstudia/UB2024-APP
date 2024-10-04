@@ -626,6 +626,17 @@ const QuestionsList = ({
     setMenuVisible(!menuVisible);
   };
 
+  const getBackgroundClass = (kategoria) => {
+    const classes = {
+      'P': 'highlight-p',
+      'L': 'highlight-l',
+      'PŻ': 'highlight-pz',
+      'I': 'highlight-i',
+    };
+  
+    return classes[kategoria] || 'highlight-default'; // Return default class if no match
+  };
+
   return (
     <div className="question-detail-background">
         <button className="back-button" onClick={() => navigate('/UB2024-APP')}>
@@ -736,16 +747,11 @@ const QuestionsList = ({
             
             <ul>
               {filteredQuestions.map((question, index) => (
-                <li
-                  key={question.id}
-                  className={`question-row ${{
-                    'P': 'highlight-p',
-                    'L': 'highlight-l',
-                    'PŻ': 'highlight-pz',
-                    'I': 'highlight-i'
-                  }[question.kategoria] || ''}`}
-                  onClick={() => handleQuestionClick(question.id)}
-                >
+                  <li
+                    key={question.id}
+                    className={`question-row ${getBackgroundClass(question.kategoria)}`} // Call the function here
+                    onClick={() => handleQuestionClick(question.id)}
+                  >
                   <div className="column">{index + 1}</div>
                   <div className="column">{question.number}</div>
                   

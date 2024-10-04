@@ -9,8 +9,12 @@ import 'react-quill/dist/quill.snow.css'; // Import the Quill CSS
 import { useSwipeable } from 'react-swipeable';
 import Papa from 'papaparse';
 import Acts from './Acts'; // Import the Acts component
+// import { OpenAI } from "openai";
 
-
+// const openai = new OpenAI({
+//   apiKey: process.env.REACT_APP_OPENAI_API_KEY, // Use your environment variable here or hardcode for testing
+//   dangerouslyAllowBrowser: true,
+// });
 
 const BASE_FILENAME = 'UB2024-APP_autosave_'; // Base filename for autosaves
 
@@ -59,6 +63,9 @@ const QuestionDetail = ({ questions, updatePodobne, updateRating, sortBy, filter
   const [lastFinalResult, setLastFinalResult] = useState(''); // Track the last final result
   const [modifiedLawContent, setModifiedLawContent] = useState('');
   const [selectedActTitle, setSelectedActTitle] = useState('');
+  // const [messages, setMessages] = useState([]);  // Chat history
+  // const [userInput, setUserInput] = useState(""); // Input field value
+  // const [isLoading, setIsLoading] = useState(false); // Loading state for response
 
   const acts = Acts();
 
@@ -486,12 +493,16 @@ useEffect(() => {
   const handlePrevious = () => navigateQuestion(-1);
   const handleNext = () => navigateQuestion(1);
 
-  const getBackgroundClass = (kategoria) => ({
-    'P': 'highlight-p',
-    'L': 'highlight-l',
-    'PŻ': 'highlight-pz',
-    'I': 'highlight-i'
-  }[kategoria] || '');
+  const getBackgroundClass = (kategoria) => {
+    const classes = {
+      'P': 'highlight-p',
+      'L': 'highlight-l',
+      'PŻ': 'highlight-pz',
+      'I': 'highlight-i',
+    };
+  
+    return classes[kategoria] || 'highlight-default'; // Return default class if no match
+  };
 
   const getRatingBackgroundColor = (rating) => {
     const colors = ['green', 'lightgreen', 'yellowgreen', 'orange', 'red'];
@@ -712,6 +723,46 @@ const copyHighlightedTextToClipboard = () => {
 
 
 
+  // // Function to send a message to the OpenAI API and get a response
+  // const sendMessageToAI = async (message) => {
+  //   setIsLoading(true);
+  //   try {
+  //     const response = await openai.chat.completions.create({
+  //       model: "gpt-3.5-turbo", // You can change to GPT-4 or other models
+  //       messages: [
+  //         ...messages, // Preserve previous chat messages
+  //         { role: "user", content: message } // Add the new user message
+  //       ],
+  //     });
+
+  //     const aiMessage = response.choices[0].message.content;
+
+  //     // Add the AI response to the chat
+  //     setMessages((prevMessages) => [
+  //       ...prevMessages,
+  //       { role: "user", content: message }, // Add user message to chat log
+  //       { role: "assistant", content: aiMessage } // Add AI message to chat log
+  //     ]);
+  //   } catch (error) {
+  //     console.error("Error fetching AI response: ", error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // // Handle input field changes
+  // const handleInputChange = (e) => {
+  //   setUserInput(e.target.value);
+  // };
+
+  // // Handle form submission (sending the message to AI)
+  // const handleSendMessage = (e) => {
+  //   e.preventDefault();
+  //   if (userInput.trim()) {
+  //     sendMessageToAI(userInput); // Call the AI function with the user's message
+  //     setUserInput(""); // Clear input after sending
+  //   }
+  // };
   return (
     <div className="question-detail-background">
         <button className="back-button" onClick={() => navigate('/UB2024-APP/questions')}>
@@ -731,6 +782,35 @@ const copyHighlightedTextToClipboard = () => {
         <div className=""style={{ display: isSaved ? 'none' : 'block' }}>
           <button className="online-red" style={{ display: autosaveEnabled ? 'none' : 'block' }} onClick={stopAutosave} ><FontAwesomeIcon icon={faCircle} /></button>
         </div>
+
+
+        {/* <div className="question-detail-container">
+          <h1>AI Chat</h1>
+
+
+          <div className="chat-history">
+            {messages.map((msg, index) => (
+              <div key={index} className={`message ${msg.role}`}>
+                <strong>{msg.role === "user" ? "You" : "AI"}:</strong> {msg.content}
+              </div>
+            ))}
+          </div>
+
+
+          <form onSubmit={handleSendMessage} className="chat-input-form">
+            <input
+              type="text"
+              value={userInput}
+              onChange={handleInputChange}
+              placeholder="Type your message here..."
+              className="chat-input"
+              disabled={isLoading} // Disable input while waiting for AI response
+            />
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? "Loading..." : "Send"}
+            </button>
+          </form>
+        </div> */}
 
         <FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={handleEditClick} />
         <strong className="question-index">
